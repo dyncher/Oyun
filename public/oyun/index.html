@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chook Zeka Dünyası | Eğlenceli Eğitici Hafıza Oyunu</title>
+    
+    <!-- Meta ve SEO -->
+    <meta name="description" content="Sizin için özel olarak tasarlanmış, sevimli çizgi karakterler ve neşeli temizlik ipuçları içeren, Chook Temiz dünyasıyla hafıza geliştirici ve eğitici zeka oyunu.">
+    <meta name="theme-color" content="#8b5cf6">
+    
+    <!-- Google Fonts (Outfit & Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome İkonları -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Özel Stil Dosyası -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="lavender-theme">
+    <!-- Arka Plan Efektleri (Parıldayan Küreler) -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <div class="app-container">
+        <!-- HEADER (Tüm ekranlarda ortak üst bar) -->
+        <header class="app-header">
+            <div class="header-logo" id="logo-btn">
+                <span class="logo-emoji">✨</span>
+                <span class="logo-text">Chook <span class="accent-text">Zeka</span></span>
+            </div>
+            <div class="header-stats">
+                <div class="stat-badge coin-badge">
+                    <i class="fas fa-crown gold-crown"></i>
+                    <span id="player-score">0</span>
+                </div>
+                <button id="theme-toggle-btn" class="icon-btn" aria-label="Tema Değiştir">
+                    <i class="fas fa-magic"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+            
+            <!-- 1. DASHBOARD / GİRİŞ EKRANI (Varsayılan) -->
+            <section id="screen-dashboard" class="game-screen active">
+                <div class="dashboard-hero animate-fade-in">
+                    <h1 class="hero-title">Zihnini Eğit, <br><span class="gradient-text">Eğlenerek Öğren!</span></h1>
+                    <p class="hero-subtitle">Sizin için özel olarak tasarlanmış, Chook Temiz dünyasıyla hafıza antrenmanı.</p>
+                </div>
+
+                <!-- Mod Seçim Kartları -->
+                <div class="modes-grid">
+                    <!-- Mod 1: Hafıza Eşleştirme -->
+                    <div class="mode-card card-memory" id="start-memory-btn">
+                        <div class="mode-card-badge">SEVİMLİ</div>
+                        <div class="mode-icon-wrapper">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h2 class="mode-title">Hafıza Eşleştirme</h2>
+                        <p class="mode-desc">Ürünlerimizin sevimli çizgi karakterleriyle kartları eşleştir, hafızanı güçlendir!</p>
+                        <div class="mode-play-btn">
+                            Hemen Başla <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+
+                    <!-- Mod 2: Bilgi Yarışması -->
+                    <div class="mode-card card-trivia" id="start-trivia-btn">
+                        <div class="mode-card-badge text-green">EĞİTİCİ</div>
+                        <div class="mode-icon-wrapper">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <h2 class="mode-title">Bilgi Yarışması</h2>
+                        <p class="mode-desc">Ev hijyeni, neşeli temizlik ipuçları ve profesyonel çözümler üzerine eğlenceli bilgiler öğren!</p>
+                        <div class="mode-play-btn">
+                            Soruya Geç <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Marka Tanıtım Şeridi (İçerik Besleme Alanı) -->
+                <footer class="brands-footer" style="justify-content: center;">
+                    <div class="brand-item">
+                        <span class="brand-logo purple">Chook Temiz</span>
+                        <p class="brand-text">Profesyonel Temizlik Çözümleri</p>
+                    </div>
+                </footer>
+            </section>
+
+            <!-- 1B. SEVİYE SEÇİM EKRANI (Yeni) -->
+            <section id="screen-levels" class="game-screen">
+                <div class="game-control-bar">
+                    <button id="levels-back-btn" class="text-btn">
+                        <i class="fas fa-chevron-left"></i> Ana Menü
+                    </button>
+                    <div class="screen-title-badge">Hafıza Seviyeleri</div>
+                    <div style="width: 50px;"></div> <!-- Görsel dengeleyici -->
+                </div>
+
+                <div class="levels-container animate-fade-in">
+                    <h2 class="section-title">Temizlik Basamakları</h2>
+                    <p class="section-subtitle">Chook Temiz ile zihnini parlat, seviyeleri birer birer aş!</p>
+                    
+                    <div class="levels-grid" id="levels-grid-container">
+                        <!-- 15 Seviye butonu JS ile buraya dinamik eklenecek -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. HAFIZA KART EŞLEŞTİRME EKRANI (Gizli) -->
+            <section id="screen-memory" class="game-screen">
+                <div class="game-control-bar">
+                    <button id="memory-back-btn" class="text-btn">
+                        <i class="fas fa-chevron-left"></i> Seviyeler
+                    </button>
+                    <div class="screen-title-badge" id="memory-level-badge">Seviye 1/15</div>
+                    <div class="game-timer">
+                        <i class="far fa-clock"></i> <span id="memory-timer">60</span>s
+                    </div>
+                </div>
+
+                <!-- Oyun İçi Skor / Kombo ve Hamle Alanı (Yenilendi) -->
+                <div class="game-stats-subbar">
+                    <div class="stat-item">
+                        <span class="stat-label">Hamle:</span>
+                        <span class="stat-value" id="memory-moves">0</span><span id="memory-moves-limit-container" class="hidden">/<span id="memory-moves-limit">15</span></span>
+                    </div>
+                    <div class="stat-item combo-badge hidden" id="memory-combo">
+                        <i class="fas fa-fire"></i> <span id="combo-multiplier">2x</span> Kombo!
+                    </div>
+                </div>
+
+                <!-- Hafıza Kartı Izgarası -->
+                <div class="memory-grid-container">
+                    <div class="memory-grid" id="memory-board">
+                        <!-- Kartlar JS ile buraya dinamik olarak eklenecek -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. BİLGİ YARIŞMASI EKRANI (Gizli) -->
+            <section id="screen-trivia" class="game-screen">
+                <div class="game-control-bar">
+                    <button class="back-to-dashboard-btn text-btn">
+                        <i class="fas fa-chevron-left"></i> Geri
+                    </button>
+                    <div class="trivia-progress">
+                        Soru: <span id="current-question-num">1</span>/5
+                    </div>
+                    <div class="trivia-score">
+                        Skor: <span id="trivia-points">0</span>
+                    </div>
+                </div>
+
+                <!-- Trivia İlerleme Çubuğu -->
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="trivia-progress-bar"></div>
+                </div>
+
+                <!-- Soru Kartı -->
+                <div class="trivia-container">
+                    <div class="question-card">
+                        <div class="trivia-category" id="trivia-category-badge">Chook Temiz - Pratik Bilgiler</div>
+                        <h2 class="question-text" id="trivia-question">Mikrofiber temizlik bezlerinin normal bezlerden farkı nedir?</h2>
+                    </div>
+
+                    <!-- Şıklar -->
+                    <div class="options-list" id="trivia-options">
+                        <!-- Seçenekler JS ile buraya dinamik eklenecek -->
+                        <button class="option-btn">
+                            <span class="option-letter">A</span>
+                            <span class="option-text">Sertleşir ve cildi çizer</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- MODALLAR & BİLGİ KARTLARI -->
+
+        <!-- 1. Marka İpucu / Eğitici Ara Geçiş Modalı -->
+        <div class="modal-overlay" id="tip-modal">
+            <div class="modal-content glass-modal animate-scale-in">
+                <div class="modal-header">
+                    <div class="tip-icon-wrapper purple-glow">
+                        <i class="fas fa-magic"></i>
+                    </div>
+                    <h3 class="modal-title">Chook İpucu!</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="tip-image-placeholder" id="tip-brand-badge">Chook Temiz</div>
+                    <p class="tip-text" id="tip-content-text">Chook Temiz mikrofiber bezleri, saç telinin 100'de biri incelikteki lifleriyle tozu adeta bir mıknatıs gibi çeker ve su lekelerini tamamen yok eder!</p>
+                </div>
+                <div class="modal-footer">
+                    <button id="close-tip-btn" class="primary-btn">Anladım, Devam Et!</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Tebrikler / Oyun Sonu Modalı -->
+        <div class="modal-overlay" id="result-modal">
+            <div class="modal-content glass-modal animate-scale-in">
+                <div class="confetti-container" id="confetti-effect"></div>
+                <div class="result-header">
+                    <div class="trophy-wrapper">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h3 class="modal-title" id="result-title">Tebrikler!</h3>
+                    <p class="result-subtitle" id="result-subtitle">Harika bir oyun çıkardın!</p>
+                </div>
+                <div class="modal-body result-stats-grid">
+                    <div class="result-stat-box">
+                        <span class="stat-label">Kazanılan Skor</span>
+                        <span class="stat-value" id="result-score-val">+150</span>
+                    </div>
+                    <div class="result-stat-box" id="result-secondary-box">
+                        <span class="stat-label" id="result-secondary-label">Hamle Sayısı</span>
+                        <span class="stat-value" id="result-secondary-val">12</span>
+                    </div>
+                </div>
+                <!-- Eğitici Bilgi Bloğu (Oyun Sonunda Reklam & Bilgi Geçişi) -->
+                <div class="result-brand-promo" id="result-promo-box">
+                    <i class="fas fa-magic" style="color: var(--text-accent);"></i>
+                    <p class="promo-text" id="result-promo-text"><strong>Chook Temiz'den bir tavsiye:</strong> Mikrofiber bezleri dairesel hareketlerle silmek yüzeylerdeki toz ve statik elektriği önler.</p>
+                </div>
+                <div class="modal-footer horizontal">
+                    <button id="result-retry-btn" class="secondary-btn"><i class="fas fa-redo"></i> Yeniden</button>
+                    <button id="result-home-btn" class="primary-btn"><i class="fas fa-home"></i> Ana Menü</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Oyun Mantığı JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>

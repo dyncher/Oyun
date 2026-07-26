@@ -17,7 +17,7 @@ export function renderHeader() {
         <nav style="display: flex; align-items: center; gap: 2.5rem; font-weight: 800; font-size: 0.85rem; text-transform: uppercase;">
           <a href="/" data-link style="color: var(--text-dark); text-decoration: none; transition: var(--transition-fast);" onmouseover="this.style.color='var(--chook-mid)'" onmouseout="this.style.color='var(--text-dark)'">Kurumsal</a>
           <a href="/siparis" data-link style="color: var(--text-dark); text-decoration: none; transition: var(--transition-fast);" onmouseover="this.style.color='var(--chook-mid)'" onmouseout="this.style.color='var(--text-dark)'">Katalog & Sipariş</a>
-          <a href="/oyun" data-link style="color: var(--text-dark); text-decoration: none; transition: var(--transition-fast);" onmouseover="this.style.color='var(--chook-mid)'" onmouseout="this.style.color='var(--text-dark)'"><i class="fas fa-gamepad" style="margin-right: 4px; color: var(--chook-light);"></i> Eğitici Oyun</a>
+          <a href="/oyun/" style="color: var(--text-dark); text-decoration: none; transition: var(--transition-fast);" onmouseover="this.style.color='var(--chook-mid)'" onmouseout="this.style.color='var(--text-dark)'"><i class="fas fa-gamepad" style="margin-right: 4px; color: var(--chook-light);"></i> Eğitici Oyun</a>
           
           <div style="width: 1px; height: 24px; background: var(--glass-border);"></div>
           

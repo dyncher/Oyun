@@ -23,7 +23,7 @@
 }
 
 /* Koyu Yeşil / Orman Teması (Varsayılan) */
-body.game-page-active.lavender-theme {
+body.lavender-theme {
     --bg-main: #05160e; /* Derin Doğa Koyu Yeşili */
     --bg-glow-1: #064e3b;
     --bg-glow-2: #10b981;
@@ -44,7 +44,7 @@ body.game-page-active.lavender-theme {
 }
 
 /* Saf Doğa / Açık Tema (Magic Butonu ile Geçiş) */
-body.game-page-active.pastel-theme {
+body.pastel-theme {
     --bg-main: #f0fdf4; /* Temiz Açık Yeşil / Saf Beyaz Dokunuş */
     --bg-glow-1: #dcfce7;
     --bg-glow-2: #bbf7d0;
@@ -72,7 +72,7 @@ body.game-page-active.pastel-theme {
     -webkit-tap-highlight-color: transparent; /* Mobil tıklama mavi çerçeve iptali */
 }
 
-body.game-page-active {
+body {
     font-family: var(--font-body);
     background-color: var(--bg-main);
     color: var(--text-main);

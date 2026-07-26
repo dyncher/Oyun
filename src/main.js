@@ -16,27 +16,12 @@ import { renderCatalogPage, initCatalogLogic } from './pages/Catalog.js';
 import { renderHomePage } from './pages/Home.js';
 import { renderProductDetailPage, initProductDetailLogic } from './pages/ProductDetail.js';
 import { renderCheckoutPage, initCheckoutLogic } from './pages/Checkout.js';
-import { renderGamePage, initGameLogic } from './pages/Game.js';
 import { updateCartProductCache } from './cart.js';
 import { ref, onValue } from './firebase.js';
 
 function router() {
   const path = window.location.pathname;
   const main = document.getElementById('main-content');
-  const header = document.querySelector('header');
-  const footer = document.querySelector('footer');
-  
-  // Clean up game-specific body classes on every route shift
-  document.body.classList.remove('game-page-active', 'lavender-theme', 'pastel-theme');
-  
-  // IMMERSIVE FULLSCREEN MODE FOR GAME
-  if (path.startsWith('/oyun')) {
-    if (header) header.style.display = 'none';
-    if (footer) footer.style.display = 'none';
-  } else {
-    if (header) header.style.display = 'flex';
-    if (footer) footer.style.display = 'block';
-  }
   
   if (path === '/' || path === '/index.html') {
     main.innerHTML = renderHomePage();
@@ -49,9 +34,6 @@ function router() {
   } else if (path.startsWith('/checkout')) {
     main.innerHTML = renderCheckoutPage();
     initCheckoutLogic();
-  } else if (path.startsWith('/oyun')) {
-    main.innerHTML = renderGamePage();
-    initGameLogic();
   } else {
     main.innerHTML = `<div class="container section-py text-center">
       <img src="https://resim.chooktemiz.com/stoklar/ChookShirin.png" alt="Sayfa Bulunamadı" style="width:150px; margin-bottom: 2rem;">

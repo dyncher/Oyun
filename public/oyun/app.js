@@ -1,82 +1,86 @@
-import '../game.css';
+/* ==========================================================================
+   CHOOK ZEKA DÜNYASI - OYUN VE ETKİLEŞİM MOTORU (app.js)
+   Açıklama: Hafıza kartı oyunu algoritması, bilgi yarışması mantığı, skor 
+   sistemi, tema değiştirici ve marka yönlendirmeli ara geçişleri yönetir.
+   ========================================================================== */
 
-// 1. BİLGİ YARIŞMASI SORULARI VE MARKA İPUÇLARI (İçerik Besleme Havuzu - 6 Soru)
+// 1. SORU HAVUZU (Eğitici, faydalı ve eğlenceli Chook Temiz soruları)
 const TRIVIA_QUESTIONS = [
     {
         category: "Chook Temiz - Pratik Bilgiler",
-        question: "Mikrofiber temizlik bezlerinin normal bezlerden en büyük farkı nedir?",
+        question: "Mikrofiber temizlik bezlerinin normal bezlerden farkı nedir?",
         options: [
-            "Mikro lifleriyle toz ve bakterileri mıknatıs gibi çekmesi",
-            "Daha renkli ve kokulu olması",
-            "Daha geç kuruması ve sertleşmesi",
-            "Sadece deterjanla çalışabilmesi"
+            "Daha ağır ve geç kuruyan yapılardır",
+            "Tozu ve kiri saç telleri kadar ince lifleriyle hapsedip deterjansız bile temizlik sağlar",
+            "Sadece cam yüzeylerde kullanılabilir, çabuk yıpranır",
+            "Hiçbir farkı yoktur, sadece bir pazarlama terimidir"
         ],
-        answer: 0,
-        tip: "Chook Temiz mikrofiber bezleri, insan saç telinin 100'de biri incelikteki lifleriyle tozu, kiri og ve statik elektriği adeta bir mıknatıs gibi çeker ve su lekesi bırakmaz!"
+        answer: 1, // B şıkkı
+        tip: "Chook Temiz mikrofiber bezleri, saç telinin 100'de biri incelikteki lifleriyle tozu adeta bir mıknatıs gibi çeker ve su lekelerini tamamen yok eder!"
     },
     {
-        category: "Chook Temiz - Elde Bulaşık",
-        question: "Bulaşıkları yıkarken aşırı köpürme sağlamak için ne yapılmalıdır?",
+        category: "Chook Temiz - Mutfak Hijyeni",
+        question: "Mutfakta yemek hazırlarken kesme tahtaları gibi gıdayla temas eden alanlar nasıl temizlenmelidir?",
         options: [
-            "Sünger yerine doğrudan beze dökülmeli",
-            "Chook Elde Bulaşık Sıvısı süngere sıkılıp ılık suyla hafifçe köpürtülmeli",
-            "Soğuk suda yarım saat bekletilmeli",
-            "Bol miktarda tuz eklenmeli"
+            "Ağır kimyasal temizleyiciler dökülüp saatlerce bekletilmelidir",
+            "Sadece kuru bezle silinip geçilmelidir",
+            "Sıcak suyla yıkanıp, gıdaya uygun ve kolay durulanan neşeli Chook hijyen ürünleriyle temizlenmelidir",
+            "Hiç temizlenmemeli, tahta kendi kendini temizler"
         ],
-        answer: 1,
-        tip: "Chook Elde Bulaşık Sıvısı, konsantre bitkisel formülü sayesinde tek bir damlasıyla dahi yağları anında sökerek pırıl pırıl, lekesiz bulaşıklar sağlar."
+        answer: 2, // C şıkkı
+        tip: "Chook Temiz hijyen çözümleri, mutfak ve banyo gibi hassas yüzeylerde kalıntı bırakmadan neşeli temizlik sunar!"
     },
     {
-        category: "Chook Temiz - Hassas Yüzeyler",
-        question: "Cam ve ayna yüzeylerde lekesiz berraklık sağlamak için en doğru yöntem hangisidir?",
+        category: "Chook Temiz - Çamaşır Bakımı",
+        question: "Renkli çamaşırların renklerinin solmasını engellemek için neye dikkat edilmelidir?",
         options: [
-            "Gazete kağıdı ve su ile dairesel ovalamak",
-            "Chook Cam ve Yüzey Temizleyici ile mikrofiber bezle silmek",
-            "Çamaşır suyu ile fırçalamak",
-            "Yüzeyi deterjanlı bırakıp kurumaya bırakmak"
+            "Çamaşırları her zaman en yüksek derecede (90 derece) yıkamak",
+            "Çamaşırları ters çevirip, düşük ısıda ve doğru renk koruyucu deterjanla yıkamak",
+            "Hepsini çamaşır suyuyla yıkamak",
+            "Çamaşırları deterjan kullanmadan yıkamak"
         ],
-        answer: 1,
-        tip: "Chook Cam ve Yüzey Temizleyici, özel iz bırakmayan formülüyle cam, ayna ve tüm parlak yüzeyleri tozdan arındırır ve cam gibi berrak bir parlaklık kazandırır."
+        answer: 1, // B şıkkı
+        tip: "Chook Temiz deterjanları renkleri korur, düşük ısılarda bile çamaşırlarınızın ilk günkü gibi canlı kalmasını sağlar."
     },
     {
-        category: "Chook Temiz - Çevre Dostu",
-        question: "Chook Temiz ürünlerinin ambalajları ve içerikleriyle ilgili çevre politikası nasıldır?",
+        category: "Chook Temiz - Doğa Dostu Temizlik",
+        question: "Elde bulaşık yıkarken su tasarrufu sağlamak ve doğayı korumak için en doğru yöntem hangisidir?",
         options: [
-            "Kimyasal içerikli ve tek kullanımlıktır",
-            "Formülleri doğada çözünebilir, ambalajları geri dönüştürülebilir yapıdadır",
-            "Ambalajları doğada yok olmaz",
-            "Sadece laboratuvarda saklanmalıdır"
+            "Suyu sürekli sonuna kadar açık bırakarak yıkamak",
+            "Bulaşıkları bir kapta biriken sabunlu suda ovalayıp ardından temiz su dolu ayrı bir kapta durulamak",
+            "Bulaşıkları hiç durulamadan rafa dizmek",
+            "Bulaşıkları çamaşır makinesinde yıkamak"
         ],
-        answer: 1,
-        tip: "Chook Temiz, çevre dostu felsefesiyle formüllerinde biyolojik olarak parçalanabilir aktif maddeler kullanır ve doğaya zarar vermeyen ambalajları tercih eder."
+        answer: 1, // B şıkkı
+        tip: "Bulaşıkları akan su yerine sabunlu kapta ovalamak ev bütçenize ve doğaya binlerce litre su kazandırır. Chook Temiz bulaşık sıvıları azıcık miktar ile bol köpük üretir!"
     },
     {
-        category: "Chook Temiz - Kireç Çözücü",
-        question: "Banyo ve mutfak bataryalarında biriken kireç lekelerinden en hızlı nasıl kurtuluruz?",
+        category: "Chook Temiz - Ev Düzeni",
+        question: "Evde toz alırken tozların havaya uçuşup tekrar yüzeylere konmasını engellemek için en doğru teknik nedir?",
         options: [
-            "Sıcak suyla durulayarak beklemek",
-            "Chook Kireç ve Pas Sökücü püskürtüp, hafifçe silip durulayarak",
-            "Yüzeyi metal telle ovarak sürtmek",
-            "Üzerine pudra dökerek silmek"
+            "Kuru toz alma bezleriyle çok hızlı sallayarak silmek",
+            "Hafif nemli bir mikrofiber bez kullanarak yukarıdan aşağıya doğru silmek",
+            "Pencereleri kapatıp oda havasızken süpürmek",
+            "Toz almaya en alt yüzeylerden başlayıp yukarı çıkmak"
         ],
-        answer: 1,
-        tip: "Chook Kireç ve Pas Sökücü, batarya ve fayanslardaki inatçı kireç ve pas lekelerini yüzeyi çizmeden saniyeler içinde çözer ve durulama sonrası ilk günkü parlaklığına kavuşturur."
+        answer: 1, // B şıkkı
+        tip: "Her zaman yukarıdan aşağıya doğru hafif nemli bezle toz almak yerçekimi sayesinde havaya kalkan tozların en son zeminde toplanmasını sağlar. Chook Temiz ile eviniz daha uzun süre toz tutmaz!"
     },
     {
-        category: "Chook Temiz - Oda Kokusu",
-        question: "Evde uzun süreli, ferahlatıcı ve kalıcı bir temizlik kokusu sağlamak için ne yapılmalıdır?",
+        category: "Chook Temiz - Neşeli Temizlik",
+        question: "Ferah ve huzurlu bir ev temizliği deneyimi için nasıl kokular tercih edilmelidir?",
         options: [
-            "Tüm pencereleri kapalı tutmak",
-            "Chook Parfümlü Oda ve Kumaş Spreyi'ni havaya ve perdelere püskürterek",
-            "Sadece yerleri suyla paspaslamak",
-            "Evde çiçek bulundurmak"
+            "Sentetik, aşırı keskin ve geniz yakan yapay kokular",
+            "Chook Temiz'in doğadan ilham alan lavanta, limon ve taze çiçek özlü neşeli kokuları",
+            "Hiç kokusu olmayan, kokusuz temizleyiciler",
+            "Sadece parfüm sıkarak temizlik havası yaratmak"
         ],
-        answer: 1,
-        tip: "Chook Oda ve Kumaş Spreyi, kumaş dokularına tutunarak gün boyu esintiyle yayılan limon, lavanta ve okyanus ferahlığını evinize taşır."
+        answer: 1, // B şıkkı
+        tip: "Chook Temiz temizleyicileri, doğadan ilham alan ferahlık özleriyle evinize hem hijyen hem de neşeli bir mutluluk getirir!"
     }
 ];
 
-// 2. HAFIZA KART DETAYLARI (16 Benzersiz Ürün ve Emoji Kartı)
+// 2. HAFIZA KART DETAYLARI (Chook Temiz Maskotları ve Ev Temizlik Emojileri - 16 Benzersiz Kart)
 const CARD_ITEMS = [
     { type: "spray_bottle", image: "assets/cute_spray_bottle.png", isEmoji: false },
     { type: "soap_bar", image: "assets/cute_soap_bar.png", isEmoji: false },
@@ -115,17 +119,16 @@ const MEMORY_LEVELS = [
     { level: 15, grid: { r: 5, c: 6 }, timer: 80, movesLimit: 44, title: "Chook Şampiyonu", desc: "30 kart. Zirvedesin! Hafıza şampiyonluk kupasını kaldır." }
 ];
 
-// 3. GLOBAL DURUM DEĞİŞKENLERİ
+// 3. GLOBAL DEĞİŞKENLER & DURUM (STATE)
 let playerTotalScore = parseInt(localStorage.getItem("chook_score")) || 0;
 let activeScreen = "dashboard";
 
-// Seviye Sistemi Durumları
+// Seviye Sistemi Değişkenleri
 let currentSelectedLevel = 1;
 let unlockedLevel = parseInt(localStorage.getItem("chook_unlocked_level")) || 1;
 let levelStars = JSON.parse(localStorage.getItem("chook_level_stars")) || {};
-let lastMemoryGameSuccess = false;
 
-// Hafıza Oyunu Durumları
+// Hafıza Oyunu Durumu
 let memoryDeck = [];
 let flippedCards = [];
 let matchedPairsCount = 0;
@@ -136,258 +139,38 @@ let isBoardLocked = false;
 let memoryComboCount = 0;
 let lastMatchTime = 0;
 
-// Bilgi Yarışması Durumları
+// Bilgi Yarışması Durumu
 let selectedTriviaQuestions = [];
 let currentQuestionIndex = 0;
 let triviaScore = 0;
 let isTriviaLocked = false;
 
-// 4. SAYFA GÖRÜNÜM ŞABLONU (ROUTER İÇİN)
-export function renderGamePage() {
-    return `
-    <div class="app-container">
-        <!-- Arka Plan Efektleri (Parıldayan Küreler) -->
-        <div class="bg-glow bg-glow-1"></div>
-        <div class="bg-glow bg-glow-2"></div>
-
-        <!-- HEADER -->
-        <header class="app-header">
-            <div class="header-logo" id="logo-btn">
-                <span class="logo-emoji">✨</span>
-                <span class="logo-text">Chook <span class="accent-text">Zeka</span></span>
-            </div>
-            <div class="header-stats">
-                <div class="stat-badge coin-badge">
-                    <i class="fas fa-crown gold-crown"></i>
-                    <span id="player-score">0</span>
-                </div>
-                <button id="theme-toggle-btn" class="icon-btn" aria-label="Tema Değiştir">
-                    <i class="fas fa-magic"></i>
-                </button>
-            </div>
-        </header>
-
-        <!-- MAIN CONTENT AREA -->
-        <main class="main-content">
-            
-            <!-- 1. DASHBOARD / GİRİŞ EKRANI -->
-            <section id="screen-dashboard" class="game-screen active">
-                <div class="dashboard-hero animate-fade-in">
-                    <h1 class="hero-title">Zihnini Eğit, <br><span class="gradient-text">Eğlenerek Öğren!</span></h1>
-                    <p class="hero-subtitle">Sizin için özel olarak tasarlanmış, Chook Temiz dünyasıyla hafıza antrenmanı.</p>
-                </div>
-
-                <!-- Mod Seçim Kartları -->
-                <div class="modes-grid">
-                    <!-- Mod 1: Hafıza Eşleştirme -->
-                    <div class="mode-card card-memory" id="start-memory-btn">
-                        <div class="mode-card-badge">SEVİMLİ</div>
-                        <div class="mode-icon-wrapper">
-                            <i class="fas fa-brain"></i>
-                        </div>
-                        <h2 class="mode-title">Hafıza Eşleştirme</h2>
-                        <p class="mode-desc">Ürünlerimizin sevimli çizgi karakterleriyle kartları eşleştir, hafızanı güçlendir!</p>
-                        <div class="mode-play-btn">
-                            Hemen Başla <i class="fas fa-arrow-right"></i>
-                        </div>
-                    </div>
-
-                    <!-- Mod 2: Bilgi Yarışması -->
-                    <div class="mode-card card-trivia" id="start-trivia-btn">
-                        <div class="mode-card-badge text-green">EĞİTİCİ</div>
-                        <div class="mode-icon-wrapper">
-                            <i class="fas fa-lightbulb"></i>
-                        </div>
-                        <h2 class="mode-title">Bilgi Yarışması</h2>
-                        <p class="mode-desc">Ev hijyeni, neşeli temizlik ipuçları ve profesyonel çözümler üzerine eğlenceli bilgiler öğren!</p>
-                        <div class="mode-play-btn">
-                            Soruya Geç <i class="fas fa-arrow-right"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Marka Tanıtım Şeridi -->
-                <footer class="brands-footer" style="justify-content: center; margin-top:2rem;">
-                    <div class="brand-item">
-                        <span class="brand-logo purple">Chook Temiz</span>
-                        <p class="brand-text">Profesyonel Temizlik Çözümleri</p>
-                    </div>
-                </footer>
-            </section>
-
-            <!-- 1B. SEVİYE SEÇİM EKRANI -->
-            <section id="screen-levels" class="game-screen">
-                <div class="game-control-bar">
-                    <button id="levels-back-btn" class="text-btn">
-                        <i class="fas fa-chevron-left"></i> Ana Menü
-                    </button>
-                    <div class="screen-title-badge">Hafıza Seviyeleri</div>
-                    <div style="width: 50px;"></div>
-                </div>
-
-                <div class="levels-container animate-fade-in">
-                    <h2 class="section-title">Temizlik Basamakları</h2>
-                    <p class="section-subtitle">Chook Temiz ile zihnini parlat, seviyeleri birer birer aş!</p>
-                    
-                    <div class="levels-grid" id="levels-grid-container">
-                        <!-- Seviye butonları dinamik yüklenecek -->
-                    </div>
-                </div>
-            </section>
-
-            <!-- 2. HAFIZA KART EŞLEŞTİRME EKRANI -->
-            <section id="screen-memory" class="game-screen">
-                <div class="game-control-bar">
-                    <button id="memory-back-btn" class="text-btn">
-                        <i class="fas fa-chevron-left"></i> Seviyeler
-                    </button>
-                    <div class="screen-title-badge" id="memory-level-badge">Seviye 1/15</div>
-                    <div class="game-timer">
-                        <i class="far fa-clock"></i> <span id="memory-timer">60</span>s
-                    </div>
-                </div>
-
-                <!-- Oyun İçi Skor ve Hamle Sınırı -->
-                <div class="game-stats-subbar">
-                    <div class="stat-item">
-                        <span class="stat-label">Hamle:</span>
-                        <span class="stat-value" id="memory-moves">0</span><span id="memory-moves-limit-container" class="hidden">/<span id="memory-moves-limit">15</span></span>
-                    </div>
-                    <div class="stat-item combo-badge hidden" id="memory-combo">
-                        <i class="fas fa-fire"></i> <span id="combo-multiplier">2x</span> Kombo!
-                    </div>
-                </div>
-
-                <!-- Hafıza Kartı Izgarası -->
-                <div class="memory-grid-container">
-                    <div class="memory-grid" id="memory-board">
-                        <!-- Kartlar dinamik yüklenecek -->
-                    </div>
-                </div>
-            </section>
-
-            <!-- 3. BİLGİ YARIŞMASI EKRANI -->
-            <section id="screen-trivia" class="game-screen">
-                <div class="game-control-bar">
-                    <button class="back-to-dashboard-btn text-btn">
-                        <i class="fas fa-chevron-left"></i> Geri
-                    </button>
-                    <div class="trivia-progress">
-                        Soru: <span id="current-question-num">1</span>/5
-                    </div>
-                    <div class="trivia-score">
-                        Skor: <span id="trivia-points">0</span>
-                    </div>
-                </div>
-
-                <!-- İlerleme Çubuğu -->
-                <div class="progress-bar-container">
-                    <div class="progress-bar-fill" id="trivia-progress-bar"></div>
-                </div>
-
-                <!-- Soru Kartı -->
-                <div class="trivia-container">
-                    <div class="question-card">
-                        <div class="trivia-category" id="trivia-category-badge">Chook Temiz</div>
-                        <h2 class="question-text" id="trivia-question">...</h2>
-                    </div>
-
-                    <!-- Şıklar -->
-                    <div class="options-list" id="trivia-options">
-                        <!-- Şıklar dinamik yüklenecek -->
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <!-- MODALLAR & BİLGİ KARTLARI -->
-
-        <!-- 1. Marka İpucu / Eğitici Ara Geçiş Modalı -->
-        <div class="modal-overlay" id="tip-modal">
-            <div class="modal-content glass-modal animate-scale-in">
-                <div class="modal-header">
-                    <div class="tip-icon-wrapper purple-glow">
-                        <i class="fas fa-magic"></i>
-                    </div>
-                    <h3 class="modal-title">Chook İpucu!</h3>
-                </div>
-                <div class="modal-body">
-                    <div class="tip-image-placeholder" id="tip-brand-badge">Chook Temiz</div>
-                    <p class="tip-text" id="tip-content-text">...</p>
-                </div>
-                <div class="modal-footer">
-                    <button id="close-tip-btn" class="primary-btn">Anladım, Devam Et!</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- 2. Tebrikler / Oyun Sonu Modalı -->
-        <div class="modal-overlay" id="result-modal">
-            <div class="modal-content glass-modal animate-scale-in">
-                <div class="confetti-container" id="confetti-effect"></div>
-                <div class="result-header">
-                    <div class="trophy-wrapper">
-                        <i class="fas fa-trophy"></i>
-                    </div>
-                    <h3 class="modal-title" id="result-title">Tebrikler!</h3>
-                    <p class="result-subtitle" id="result-subtitle">Harika bir oyun çıkardın!</p>
-                </div>
-                <div class="modal-body result-stats-grid">
-                    <div class="result-stat-box">
-                        <span class="stat-label">Kazanılan Skor</span>
-                        <span class="stat-value" id="result-score-val">+150</span>
-                    </div>
-                    <div class="result-stat-box" id="result-secondary-box">
-                        <span class="stat-label" id="result-secondary-label">Hamle Sayısı</span>
-                        <span class="stat-value" id="result-secondary-val">12</span>
-                    </div>
-                </div>
-                <!-- Eğitici Bilgi Bloğu -->
-                <div class="result-brand-promo" id="result-promo-box">
-                    <i class="fas fa-magic" style="color: var(--text-accent);"></i>
-                    <p class="promo-text" id="result-promo-text">...</p>
-                </div>
-                <div class="modal-footer horizontal">
-                    <button id="result-retry-btn" class="secondary-btn"><i class="fas fa-redo"></i> Yeniden</button>
-                    <button id="result-home-btn" class="primary-btn"><i class="fas fa-home"></i> Ana Menü</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    `;
-}
-
-// 5. OYUN MANTIĞININ BAŞLATILMASI
-export function initGameLogic() {
-    // Skor, kilit ve yıldız yüklemeleri
-    playerTotalScore = parseInt(localStorage.getItem("chook_score")) || 0;
-    unlockedLevel = parseInt(localStorage.getItem("chook_unlocked_level")) || 1;
-    levelStars = JSON.parse(localStorage.getItem("chook_level_stars")) || {};
-
+// 4. SAYFA YÜKLENİRKEN ÇALIŞACAK KODLAR
+document.addEventListener("DOMContentLoaded", () => {
     initUI();
     setupEventListeners();
-}
+});
 
 // Arayüz Başlangıç Ayarları
 function initUI() {
+    // Toplam skoru ekrana yaz
     document.getElementById("player-score").textContent = playerTotalScore;
     
     // Temayı yükle (LocalStorage'dan)
     const savedTheme = localStorage.getItem("chook_theme") || "lavender-theme";
     document.body.className = savedTheme;
-    document.body.classList.add("game-page-active");
 }
 
-// ETKİNLİK DİNLEYİCİLERİ
+// 5. ETKİNLİK DİNLEYİCİLERİ (EVENT LISTENERS)
 function setupEventListeners() {
-    // Tema Değiştirme
+    // Tema Değiştirme Butonu
     document.getElementById("theme-toggle-btn").addEventListener("click", toggleTheme);
 
-    // Dashboard Yönlendirmeleri
+    // Dashboard -> Mod Girişleri
     document.getElementById("start-memory-btn").addEventListener("click", () => switchScreen("levels"));
     document.getElementById("start-trivia-btn").addEventListener("click", () => switchScreen("trivia"));
 
-    // Logo Tıklama (Giriş Ekranına Dönüş)
+    // Logo Tıklama (Ana Sayfaya Dönüş)
     document.getElementById("logo-btn").addEventListener("click", () => switchScreen("dashboard"));
 
     // Geri Dönüş Butonları
@@ -398,33 +181,16 @@ function setupEventListeners() {
         btn.addEventListener("click", () => switchScreen("dashboard"));
     });
 
-    // Modal Butonları
+    // Modallardan Çıkış ve Menü Butonları
     document.getElementById("close-tip-btn").addEventListener("click", closeTipModal);
-    
     document.getElementById("result-home-btn").addEventListener("click", () => {
         closeResultModal();
-        if (activeScreen === "memory") {
-            switchScreen("levels");
-        } else {
-            switchScreen("dashboard");
-        }
+        switchScreen("dashboard");
     });
-
-    document.getElementById("result-retry-btn").addEventListener("click", () => {
-        closeResultModal();
-        if (activeScreen === "memory") {
-            if (lastMemoryGameSuccess && currentSelectedLevel < 15) {
-                startMemoryGame(currentSelectedLevel + 1);
-            } else {
-                startMemoryGame(currentSelectedLevel);
-            }
-        } else if (activeScreen === "trivia") {
-            startTriviaGame();
-        }
-    });
+    document.getElementById("result-retry-btn").addEventListener("click", restartCurrentGame);
 }
 
-// TEMA VE EKRAN DEĞİŞTİRME MANTIĞI
+// 6. TEMA VE EKRAN DEĞİŞTİRME MANTIĞI
 function toggleTheme() {
     const body = document.body;
     if (body.classList.contains("lavender-theme")) {
@@ -435,12 +201,16 @@ function toggleTheme() {
         localStorage.setItem("chook_theme", "lavender-theme");
     }
     
+    // Küçük bir tık hissi ve pırıltı efekti
     const btn = document.getElementById("theme-toggle-btn");
     btn.style.transform = "scale(0.9) rotate(20deg)";
-    setTimeout(() => { btn.style.transform = "scale(1) rotate(0deg)"; }, 150);
+    setTimeout(() => {
+        btn.style.transform = "scale(1) rotate(0deg)";
+    }, 150);
 }
 
 function switchScreen(screenName, levelNum = null) {
+    // Önceki ekranların zamanlayıcılarını ve durumlarını temizle
     stopMemoryTimer();
     
     // Tüm ekranları gizle
@@ -455,6 +225,7 @@ function switchScreen(screenName, levelNum = null) {
         activeScreen = screenName;
     }
 
+    // Seçilen ekrana göre oyunu sıfırla ve başlat
     if (screenName === "levels") {
         renderLevelsScreen();
     } else if (screenName === "memory") {
@@ -464,9 +235,11 @@ function switchScreen(screenName, levelNum = null) {
     }
 }
 
-// HAFIZA SEVİYE SEÇİM EKRANI VE OYUN MOTORU
+// 7. HAFIZA SEVİYE SEÇİM EKRANI VE OYUN MOTORU (YENİLENDİ)
 
+// Seviye Seçim Ekranını Oluştur
 function renderLevelsScreen() {
+    // Toplam skoru ekrana yaz
     document.getElementById("player-score").textContent = playerTotalScore;
 
     const gridContainer = document.getElementById("levels-grid-container");
@@ -511,6 +284,7 @@ function renderLevelsScreen() {
                 ${statusHTML}
             `;
 
+            // Tıklayınca Seviyeyi Başlat
             card.addEventListener("click", () => {
                 switchScreen("memory", lvl.level);
             });
@@ -520,10 +294,12 @@ function renderLevelsScreen() {
     });
 }
 
+// Belirli Bir Seviyede Oyunu Başlat
 function startMemoryGame(levelNum) {
     currentSelectedLevel = levelNum;
     lastMemoryGameSuccess = false;
 
+    // Seviye yapılandırmasını bul
     const lvlCfg = MEMORY_LEVELS.find(l => l.level === levelNum);
     if (!lvlCfg) return;
 
@@ -537,10 +313,11 @@ function startMemoryGame(levelNum) {
 
     // DOM Güncellemeleri
     document.getElementById("memory-moves").textContent = "0";
-    document.getElementById("memory-timer").textContent = memoryTimeRemaining;
+    document.getElementById("memory-timer").textContent = lvlCfg.timer;
     document.getElementById("memory-combo").classList.add("hidden");
     document.getElementById("memory-level-badge").textContent = `Seviye ${lvlCfg.level} - ${lvlCfg.title}`;
 
+    // Hamle sınırı kontrolü ve sıfırlanması
     const movesLimitContainer = document.getElementById("memory-moves-limit-container");
     const movesDisplay = document.getElementById("memory-moves");
     movesDisplay.classList.remove("warning");
@@ -552,15 +329,19 @@ function startMemoryGame(levelNum) {
         movesLimitContainer.classList.add("hidden");
     }
 
+    // Kartların oluşturulması (Seviye boyutuna göre dinamik çift sayısı)
     const numPairs = (lvlCfg.grid.r * lvlCfg.grid.c) / 2;
+    // Benzersiz kartları seç ve çoğalt
     const selectedItems = CARD_ITEMS.slice(0, numPairs);
     const doubleItems = [...selectedItems, ...selectedItems];
     memoryDeck = shuffleArray(doubleItems);
 
+    // Tahta özellikleri ve sütun yapısı
     const board = document.getElementById("memory-board");
     board.innerHTML = "";
     board.style.gridTemplateColumns = `repeat(${lvlCfg.grid.c}, 1fr)`;
 
+    // Sütun sayısı 5 veya daha fazlaysa kompakt boyutlandırmayı aktifleştir
     if (lvlCfg.grid.c >= 5) {
         board.classList.add("compact");
     } else {
@@ -576,6 +357,7 @@ function startMemoryGame(levelNum) {
         const cardInner = document.createElement("div");
         cardInner.classList.add("card-inner");
 
+        // Kartın arkası
         const cardBack = document.createElement("div");
         cardBack.classList.add("card-face", "card-back");
         const logoPlaceholder = document.createElement("div");
@@ -583,6 +365,7 @@ function startMemoryGame(levelNum) {
         logoPlaceholder.innerHTML = "✨";
         cardBack.appendChild(logoPlaceholder);
 
+        // Kartın önü (Resim veya Emoji)
         const cardFront = document.createElement("div");
         cardFront.classList.add("card-face", "card-front");
 
@@ -615,6 +398,7 @@ function startMemoryGame(levelNum) {
         board.appendChild(cardWrapper);
     });
 
+    // Süre Sayacını Başlat
     startMemoryTimer();
 }
 
@@ -622,6 +406,7 @@ function handleCardClick(card, lvlCfg) {
     if (isBoardLocked) return;
     if (card.classList.contains("flipped") || card.classList.contains("matched")) return;
 
+    // Kartı döndür
     card.classList.add("flipped");
     flippedCards.push(card);
 
@@ -630,6 +415,7 @@ function handleCardClick(card, lvlCfg) {
         const movesDisplay = document.getElementById("memory-moves");
         movesDisplay.textContent = memoryMoves;
 
+        // Hamle Sınırı uyarısı (son 3 hamlede kırmızı yanıp sönsün)
         if (lvlCfg.movesLimit) {
             const remainingMoves = lvlCfg.movesLimit - memoryMoves;
             if (remainingMoves <= 3) {
@@ -650,10 +436,12 @@ function checkMemoryMatch(lvlCfg) {
     const numPairs = (lvlCfg.grid.r * lvlCfg.grid.c) / 2;
 
     if (type1 === type2) {
+        // Eşleşme Başarılı!
         card1.classList.add("matched");
         card2.classList.add("matched");
         matchedPairsCount++;
 
+        // Kombo Sistemi
         const now = Date.now();
         if (lastMatchTime > 0 && (now - lastMatchTime) < 4000) {
             memoryComboCount++;
@@ -667,20 +455,24 @@ function checkMemoryMatch(lvlCfg) {
         flippedCards = [];
         isBoardLocked = false;
 
+        // Tüm Çiftler Eşleşti mi?
         if (matchedPairsCount === numPairs) {
             stopMemoryTimer();
             setTimeout(winMemoryGame, 500);
         }
     } else {
+        // Eşleşme Başarısız, kartları geri kapat
         setTimeout(() => {
             card1.classList.remove("flipped");
             card2.classList.remove("flipped");
             flippedCards = [];
             isBoardLocked = false;
 
+            // Komboyu sıfırla
             memoryComboCount = 0;
             document.getElementById("memory-combo").classList.add("hidden");
 
+            // Hamle sınırından dolayı yenildi mi kontrolü (kartlar kapandıktan sonra)
             if (lvlCfg.movesLimit && memoryMoves >= lvlCfg.movesLimit) {
                 stopMemoryTimer();
                 gameOverMemoryGame();
@@ -722,10 +514,12 @@ function stopMemoryTimer() {
     }
 }
 
+// Seviyeyi Kazanma Durumu
 function winMemoryGame() {
     lastMemoryGameSuccess = true;
     const lvlCfg = MEMORY_LEVELS.find(l => l.level === currentSelectedLevel);
 
+    // Yıldız hesaplama
     let starsAwarded = 1;
     if (lvlCfg.movesLimit) {
         const movesRatio = memoryMoves / lvlCfg.movesLimit;
@@ -737,23 +531,28 @@ function winMemoryGame() {
         else if (timeRatio >= 0.2) starsAwarded = 2;
     }
 
+    // Yıldız durumunu kaydet
     const prevStars = levelStars[currentSelectedLevel] || 0;
     levelStars[currentSelectedLevel] = Math.max(prevStars, starsAwarded);
     localStorage.setItem("chook_level_stars", JSON.stringify(levelStars));
 
+    // Sonraki seviyenin kilidini aç
     if (currentSelectedLevel === unlockedLevel && unlockedLevel < 15) {
         unlockedLevel++;
         localStorage.setItem("chook_unlocked_level", unlockedLevel);
     }
 
+    // Puan hesaplama (Taban 100 puan + Seviye * 20 puan + kalan her saniye için +5 puan)
     const levelBonus = currentSelectedLevel * 20;
     const timeBonus = memoryTimeRemaining * 5;
     const totalWinPoints = 100 + levelBonus + timeBonus;
 
     updatePlayerTotalScore(totalWinPoints);
 
+    // Tip Modalı ve marka neşesi ipucu
     const randomTip = getRandomBrandTip();
 
+    // Sonuç butonlarını dinamik olarak özelleştir
     const retryBtn = document.getElementById("result-retry-btn");
     const homeBtn = document.getElementById("result-home-btn");
 
@@ -764,6 +563,7 @@ function winMemoryGame() {
     }
     homeBtn.innerHTML = '<i class="fas fa-th"></i> Seviyeler';
 
+    // Yıldız ikonlarını hazırla
     let starsHTML = "";
     for (let i = 0; i < 3; i++) {
         starsHTML += i < starsAwarded 
@@ -772,6 +572,7 @@ function winMemoryGame() {
     }
 
     showTipModal(randomTip, () => {
+        // Tip kapatıldığında Sonuç Ekranını Aç
         showResultModal({
             title: `Seviye ${currentSelectedLevel} Tamamlandı!`,
             subtitle: `<div style="margin-bottom: 8px;">Zihniniz Chook Temiz gibi parıldıyor!</div><div class="stars-display" style="display:flex; justify-content:center; align-items:center; margin-top:8px;">${starsHTML}</div>`,
@@ -783,10 +584,12 @@ function winMemoryGame() {
     });
 }
 
+// Oyunu Kaybetme / Süre-Hamle Dolma Durumu
 function gameOverMemoryGame() {
     lastMemoryGameSuccess = false;
     const lvlCfg = MEMORY_LEVELS.find(l => l.level === currentSelectedLevel);
 
+    // Sonuç butonlarını sıfırla
     const retryBtn = document.getElementById("result-retry-btn");
     const homeBtn = document.getElementById("result-home-btn");
 
@@ -805,13 +608,15 @@ function gameOverMemoryGame() {
     });
 }
 
-// BİLGİ YARIŞMASI MOTORU
+// 8. BİLGİ YARIŞMASI MOTORU
 function startTriviaGame() {
     currentQuestionIndex = 0;
     triviaScore = 0;
     isTriviaLocked = false;
 
+    // Soru havuzundan rastgele 5 soru seç
     selectedTriviaQuestions = shuffleArray([...TRIVIA_QUESTIONS]).slice(0, 5);
+
     renderTriviaQuestion();
 }
 
@@ -819,15 +624,18 @@ function renderTriviaQuestion() {
     isTriviaLocked = false;
     const currentQuestion = selectedTriviaQuestions[currentQuestionIndex];
 
+    // İlerleme çubuğunu ve metinleri güncelle
     document.getElementById("current-question-num").textContent = currentQuestionIndex + 1;
     document.getElementById("trivia-points").textContent = triviaScore;
 
     const progressPercent = ((currentQuestionIndex + 1) / 5) * 100;
     document.getElementById("trivia-progress-bar").style.width = `${progressPercent}%`;
 
+    // Kategori ve Soru Metni
     document.getElementById("trivia-category-badge").textContent = currentQuestion.category;
     document.getElementById("trivia-question").textContent = currentQuestion.question;
 
+    // Şıkları Temizle ve Oluştur
     const optionsContainer = document.getElementById("trivia-options");
     optionsContainer.innerHTML = "";
 
@@ -864,15 +672,20 @@ function handleOptionClick(selectedIndex, clickedBtn) {
     const buttons = optionsContainer.querySelectorAll(".option-btn");
 
     if (selectedIndex === correctIndex) {
+        // Doğru Cevap!
         clickedBtn.classList.add("correct");
         triviaScore += 50;
         document.getElementById("trivia-points").textContent = triviaScore;
     } else {
+        // Yanlış Cevap
         clickedBtn.classList.add("incorrect");
+        // Doğru olanı da yeşil yakarak göster
         buttons[correctIndex].classList.add("correct");
     }
 
+    // 1.5 saniye bekle, ardından bir sonraki soruya veya marka ipucu ekranına geç
     setTimeout(() => {
+        // Her 2 soruda bir veya son sorudan önce marka ipucu modalı çıkartalım (Öğretici içerik beslemesi)
         if (currentQuestionIndex === 1 || currentQuestionIndex === 3) {
             showTipModal(currentQuestion, () => {
                 goToNextQuestion();
@@ -895,6 +708,7 @@ function goToNextQuestion() {
 function finishTriviaGame() {
     updatePlayerTotalScore(triviaScore);
 
+    // Sonuç modalını göster
     showResultModal({
         title: "Yarışma Bitti!",
         subtitle: "Tebrikler! Soruları yanıtlayarak harika bilgiler öğrendin.",
@@ -905,18 +719,21 @@ function finishTriviaGame() {
     });
 }
 
-// MODAL YÖNETİMİ
+// 9. MODAL YÖNETİMİ (Kılavuzlar ve Sonuçlar)
 function showTipModal(contentObj, onCloseCallback) {
     const tipModal = document.getElementById("tip-modal");
     
+    // İçeriği güncelle
     document.getElementById("tip-brand-badge").textContent = contentObj.category.split(" - ")[0];
     document.getElementById("tip-content-text").textContent = contentObj.tip;
 
+    // Logoyu renklendir
     const badge = document.getElementById("tip-brand-badge");
     badge.style.background = "var(--grad-chook)";
 
     tipModal.classList.add("active");
 
+    // Kapatma butonu dinleyicisi (Tek seferlik çalışması için once: true kullanılır)
     const closeBtn = document.getElementById("close-tip-btn");
     const handleClose = () => {
         closeTipModal();
@@ -942,6 +759,7 @@ function showResultModal(config) {
 
     modal.classList.add("active");
 
+    // Eğer kazanılan puan varsa konfeti yağdır!
     if (config.score !== "+0") {
         triggerConfetti();
     }
@@ -950,18 +768,30 @@ function showResultModal(config) {
 function closeResultModal() {
     document.getElementById("result-modal").classList.remove("active");
     const confettiContainer = document.getElementById("confetti-effect");
-    confettiContainer.innerHTML = "";
+    confettiContainer.innerHTML = ""; // Konfetileri temizle
 }
 
+function restartCurrentGame() {
+    closeResultModal();
+    if (activeScreen === "memory") {
+        startMemoryGame();
+    } else if (activeScreen === "trivia") {
+        startTriviaGame();
+    }
+}
+
+// 10. YARDIMCI ALGORİTMALAR VE EFEKTLER
+
+// Toplam Skor Güncelleme & Animasyonu
 function updatePlayerTotalScore(pointsToAdd) {
     playerTotalScore += pointsToAdd;
     localStorage.setItem("chook_score", playerTotalScore);
 
     const scoreEl = document.getElementById("player-score");
-    if (!scoreEl) return;
     
+    // Sayı artma animasyonu simülasyonu
     let start = playerTotalScore - pointsToAdd;
-    const duration = 800;
+    const duration = 800; // ms
     const stepTime = Math.max(Math.floor(duration / pointsToAdd), 15);
     
     const timer = setInterval(() => {
@@ -973,14 +803,13 @@ function updatePlayerTotalScore(pointsToAdd) {
         scoreEl.textContent = start;
     }, stepTime);
 
+    // Taç parlaması
     const crown = document.querySelector(".gold-crown");
-    if (crown) {
-        crown.style.transform = "scale(1.4) rotate(-15deg)";
-        setTimeout(() => { crown.style.transform = "scale(1) rotate(0deg)"; }, 300);
-    }
+    crown.style.transform = "scale(1.4) rotate(-15deg)";
+    setTimeout(() => { crown.style.transform = "scale(1) rotate(0deg)"; }, 300);
 }
 
-// YARDIMCI ALGORİTMALAR
+// Dizi Karıştırma (Fisher-Yates Shuffle)
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -989,17 +818,18 @@ function shuffleArray(array) {
     return array;
 }
 
+// Rastgele Marka İpucu Getirici
 function getRandomBrandTip() {
     const randomIndex = Math.floor(Math.random() * TRIVIA_QUESTIONS.length);
     return TRIVIA_QUESTIONS[randomIndex];
 }
 
+// Pürüzsüz Saf JS Konfeti Efekti
 function triggerConfetti() {
     const container = document.getElementById("confetti-effect");
-    if (!container) return;
     container.innerHTML = "";
 
-    const colors = ["#10b981", "#fbbf24", "#3b82f6", "#ef4444", "#8b5cf6"];
+    const colors = ["#8b5cf6", "#ec4899", "#10b981", "#fbbf24", "#3b82f6"];
     const confettiCount = 60;
 
     for (let i = 0; i < confettiCount; i++) {
@@ -1010,13 +840,15 @@ function triggerConfetti() {
         confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
         confetti.style.borderRadius = Math.random() > 0.5 ? "50%" : "2px";
         
+        // Başlangıç konumları (üst ortadan saçılma)
         confetti.style.left = `${Math.random() * 100}%`;
         confetti.style.top = `${Math.random() * -20}%`;
         
         container.appendChild(confetti);
 
-        const duration = Math.random() * 3 + 2;
-        const drift = (Math.random() - 0.5) * 100;
+        // Bağımsız animasyon kurgusu
+        const duration = Math.random() * 3 + 2; // saniye
+        const drift = (Math.random() - 0.5) * 100; // yatay sapma (px)
         
         confetti.animate([
             { transform: `translateY(0) rotate(0deg)`, opacity: 1 },
