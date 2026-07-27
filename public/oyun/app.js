@@ -147,7 +147,7 @@ let isTriviaLocked = false;
 
 // Yapboz Oyunu Durumu
 let puzzleGridSize = 3;
-let puzzleSelectedImg = "https://resim.chooktemiz.com/stoklar/ChookShirin.png";
+let puzzleSelectedImg = "./assets/cute_spray_bottle.png";
 let puzzlePieces = [];
 let puzzleSelectedPieceIndex = null;
 let puzzleMoves = 0;
