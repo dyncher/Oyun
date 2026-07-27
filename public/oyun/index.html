@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chook Zeka Dünyası | Eğlenceli Eğitici Hafıza Oyunu</title>
+    <title>Chook Temiz Zeka Dünyası | oyun.chooktemiz.com</title>
     
     <!-- Meta ve SEO -->
-    <meta name="description" content="Sizin için özel olarak tasarlanmış, sevimli çizgi karakterler ve neşeli temizlik ipuçları içeren, Chook Temiz dünyasıyla hafıza geliştirici ve eğitici zeka oyunu.">
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="description" content="oyun.chooktemiz.com ile eğlenceli ve eğitici temizlik zeka oyunları! Sevimli kedi maskotumuz CHOX ile hafıza kartları, ürün yapbozları ve akıllı bilgi yarışmaları sizi bekliyor.">
+    <meta name="theme-color" content="#0B3C2A">
+    <link rel="icon" type="image/png" href="assets/favicon.png">
     
     <!-- Google Fonts (Outfit & Inter) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,9 +29,9 @@
     <div class="app-container">
         <!-- HEADER (Tüm ekranlarda ortak üst bar) -->
         <header class="app-header">
-            <div class="header-logo" id="logo-btn">
-                <span class="logo-emoji">✨</span>
-                <span class="logo-text">Chook <span class="accent-text">Zeka</span></span>
+            <div class="header-logo" id="logo-btn" style="display: flex; align-items: center; gap: 8px;">
+                <img src="assets/favicon.png" alt="CHOX" style="height: 32px; width: 32px; border-radius: 50%; object-fit: contain;">
+                <span class="logo-text">oyun.<span class="accent-text">chooktemiz</span>.com</span>
             </div>
             <div class="header-stats">
                 <div class="stat-badge coin-badge">
@@ -52,6 +53,14 @@
             
              <!-- 1. DASHBOARD / GİRİŞ EKRANI (Varsayılan) -->
             <section id="screen-dashboard" class="game-screen active">
+                <div class="dashboard-logo-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 24px; padding: 0 16px;">
+                    <div style="background-color: #1b3d22; padding: 24px; border-radius: 24px; box-shadow: 0 12px 36px rgba(11, 60, 42, 0.35); border: 2px solid rgba(255, 255, 255, 0.15); display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 320px; text-align: center;">
+                        <img src="assets/chox_cat.png" alt="CHOX" style="width: 140px; height: 140px; object-fit: contain; border-radius: 50%; margin-bottom: 12px;">
+                        <h2 style="font-family: 'Outfit', 'Montserrat', sans-serif; font-weight: 800; color: #ffffff; font-size: 38px; letter-spacing: 6px; margin: 0 0 4px 0; text-transform: uppercase;">CHOX</h2>
+                        <span style="font-family: 'Caveat', 'Dancing Script', serif; font-size: 18px; color: #e2e8f0; display: block; margin-bottom: 12px;">Temizlik &amp; Zeka Oyunları</span>
+                        <span style="font-family: 'Inter', sans-serif; font-size: 13px; color: #94a3b8; font-weight: 500; letter-spacing: 1px;">oyun.chooktemiz.com</span>
+                    </div>
+                </div>
                 <div class="dashboard-hero animate-fade-in">
                     <h1 class="hero-title" data-i18n="hero-title">Zihnini Eğit, <br><span class="gradient-text">Eğlenerek Öğren!</span></h1>
                     <p class="hero-subtitle" data-i18n="hero-subtitle">Sizin için özel olarak tasarlanmış, Chook Temiz dünyasıyla zeka antrenmanı.</p>

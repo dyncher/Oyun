@@ -72,15 +72,15 @@ const I18N_DATA = {
             },
             {
                 category: "Pratik Hijyen (Kolay)",
-                question: "Evde toz alırken tozların havaya uçuşup tekrar yüzeylere konmasını engellemek için en doğru teknik nedir?",
+                question: "Sevimli kedi maskotumuz CHOX'un da bildiği gibi; kediler dünyadaki en temiz hayvanlardan biridir. Sağlıklı bir kedi, gününün yaklaşık ne kadarını kendisini, yavrularını veya eşini temizlemeye ve tımar etmeye harcar?",
                 options: [
-                    "Kuru tüy bezlerle çok hızlı sallayarak silmek",
-                    "Hafif nemli bir mikrofiber bez kullanarak yukarıdan aşağıya tek yönde silmek",
-                    "Pencereleri kapatıp oda havasızken süpürmek",
-                    "Toz almaya en alt yüzeylerden başlayıp yukarı çıkmak"
+                    "Gününün yaklaşık %10-15'ini",
+                    "Gününün yaklaşık %30-50'sini (yani uyanık kaldığı sürenin neredeyse yarısını)",
+                    "Gününün sadece %5'ini",
+                    "Kediler kendilerini hiç temizlemez, sadece uyurlar"
                 ],
                 answer: 1,
-                tip: "Hafif nemli mikrofiber bez tozları liflerine hapseder. Chook Temiz mikrofiber bezleri deterjansız bile yüksek statik çekim gücüyle tozları mıknatıs gibi yakalar!"
+                tip: "Kediler uyanık kaldıkları sürenin yarısını kendilerini ve sevdiklerini titizlikle temizleyerek geçirirler. Temizlik tutkunu maskotumuz CHOX da pırıl pırıl evlere ve oyunlara bayılır!"
             },
             // --- LEVEL 2: Orta (Cilt Sağlığı & Hijyen) ---
             {
@@ -345,7 +345,7 @@ const I18N_DATA = {
             { level: 15, grid: { r: 5, c: 6 }, timer: 80, movesLimit: 44, title: "Chook Şampiyonu", desc: "30 kart. Zirvedesin! Hafıza şampiyonluk kupasını kaldır." }
         ],
         word_pool: [
-            { word: "CHOOK", hint: "Doğadan ilham alan, her yeri ışıl ışıl parıldatan neşeli temizlik markamız.", tip: "Chook Temiz, doğaya ve geleceğe değer veren vegan formülleriyle evinizi neşeyle parlatır!" },
+            { word: "CHOX", hint: "Chook Temiz'in temizlik delisi, uyanık vaktinin yarısını tımarla geçiren sevimli kedi maskotu.", tip: "Kediler uyanık zamanlarının neredeyse %50'sini kendilerini, yavrularını ve eşlerini temizlemeye harcar. CHOX da tam bir temizlik uzmanıdır!" },
             { word: "TEMİZ", hint: "Evlerimizin hijyenik, lekesiz, ferah ve pırıl pırıl olma durumu.", tip: "Temiz bir ev, sakin bir zihnin en önemli destekçisidir." },
             { word: "SABUN", hint: "Geleneksel temizlikte sıvı Arap formuyla çok sevilen doğal köpüklü temizleyici.", tip: "Chook Sıvı Arap Sabunu, tüm yüzeylerde iz bırakmadan geleneksel temizlik ve parlaklık sunar." },
             { word: "KÖPÜK", hint: "Deterjanın suyla birleştiğinde oluşturduğu, temizliği hissettiren hafif beyaz baloncuklar.", tip: "Bol köpük neşeli temizlik demektir! Chook deterjanları az bir miktar ile bol köpürür." },
@@ -1152,15 +1152,15 @@ const I18N_DATA = {
             },
             {
                 category: "Practical Hygiene (Easy)",
-                question: "What is the correct dusting technique to prevent dust from flying into the air and settling back on surfaces?",
+                question: "As our cute cat mascot CHOX knows, cats are among the cleanest animals in the world. Approximately how much of their day does a healthy cat spend grooming and cleaning themselves, their kittens, or their mates?",
                 options: [
-                    "Dust with a dry feather duster very quickly",
-                    "Wipe in one direction from top to bottom using a slightly damp microfiber cloth",
-                    "Close windows and sweep when the room has no ventilation",
-                    "Start dusting from the lowest surfaces and go up"
+                    "About 10-15% of their day",
+                    "About 30-50% of their day (almost half of their waking hours)",
+                    "Only 5% of their day",
+                    "Cats never clean themselves, they only sleep"
                 ],
                 answer: 1,
-                tip: "A damp microfiber cloth traps dust in its fibers. Chook microfiber cloths catch dust like a magnet even without detergent!"
+                tip: "Cats spend nearly half of their waking hours meticulously cleaning themselves and their loved ones. Our cleanliness-loving mascot CHOX also loves sparkling homes and games!"
             },
             // --- LEVEL 2: Medium (Skin Health & Hygiene) ---
             {
@@ -1425,7 +1425,7 @@ const I18N_DATA = {
             { level: 15, grid: { r: 5, c: 6 }, timer: 80, movesLimit: 44, title: "Chook Champion", desc: "30 cards. You are at the top! Raise the memory championship cup." }
         ],
         word_pool: [
-            { word: "CHOOK", hint: "Our cheerful cleaning brand inspired by nature, making everywhere sparkle.", tip: "Chook Clean polishes your home with joy through vegan formulas that care for nature and the future!" },
+            { word: "CHOX", hint: "Chook Clean's cute mascot cat obsessed with cleanliness, spending half her waking hours grooming.", tip: "Cats spend nearly 50% of their waking hours cleaning themselves, their kittens, and partners. Mascot CHOX is a true hygiene expert!" },
             { word: "CLEAN", hint: "The state of our homes being hygienic, spotless, fresh, and bright.", tip: "A clean home is one of the most important supporters of a calm mind." },
             { word: "SOAP", hint: "A natural foaming cleanser loved for its liquid Arabic soap form in traditional cleaning.", tip: "Chook Liquid Arabic Soap offers traditional cleaning and shine on all surfaces without leaving marks." },
             { word: "BUBBLE", hint: "Light white bubbles formed when detergent mixes with water, making you feel the cleanliness.", tip: "Plenty of bubbles means happy cleaning! Chook detergents foam richly with just a small amount." },
