@@ -46,11 +46,11 @@
         <!-- MAIN CONTENT AREA -->
         <main class="main-content">
             
-            <!-- 1. DASHBOARD / GİRİŞ EKRANI (Varsayılan) -->
+             <!-- 1. DASHBOARD / GİRİŞ EKRANI (Varsayılan) -->
             <section id="screen-dashboard" class="game-screen active">
                 <div class="dashboard-hero animate-fade-in">
                     <h1 class="hero-title">Zihnini Eğit, <br><span class="gradient-text">Eğlenerek Öğren!</span></h1>
-                    <p class="hero-subtitle">Sizin için özel olarak tasarlanmış, Chook Temiz dünyasıyla hafıza antrenmanı.</p>
+                    <p class="hero-subtitle">Sizin için özel olarak tasarlanmış, Chook Temiz dünyasıyla zeka antrenmanı.</p>
                 </div>
 
                 <!-- Mod Seçim Kartları -->
@@ -68,16 +68,42 @@
                         </div>
                     </div>
 
-                    <!-- Mod 2: Bilgi Yarışması -->
+                    <!-- Mod 2: Ürün Yapbozu (Yeni) -->
+                    <div class="mode-card card-puzzle" id="start-puzzle-btn" style="background: rgba(16, 185, 129, 0.04); border-color: rgba(16, 185, 129, 0.15);">
+                        <div class="mode-card-badge" style="background: var(--text-accent); color: #05160e;">YENİ</div>
+                        <div class="mode-icon-wrapper" style="color: var(--text-accent);">
+                            <i class="fas fa-puzzle-piece"></i>
+                        </div>
+                        <h2 class="mode-title">Ürün Yapbozu</h2>
+                        <p class="mode-desc">Doğa dostu ürünlerimizin görsellerini bir araya getirin, görsel zekanızı geliştirin!</p>
+                        <div class="mode-play-btn" style="color: var(--text-accent);">
+                            Görseli Seç <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+
+                    <!-- Mod 3: Bilgi Yarışması -->
                     <div class="mode-card card-trivia" id="start-trivia-btn">
                         <div class="mode-card-badge text-green">EĞİTİCİ</div>
                         <div class="mode-icon-wrapper">
                             <i class="fas fa-lightbulb"></i>
                         </div>
                         <h2 class="mode-title">Bilgi Yarışması</h2>
-                        <p class="mode-desc">Ev hijyeni, neşeli temizlik ipuçları ve profesyonel çözümler üzerine eğlenceli bilgiler öğren!</p>
+                        <p class="mode-desc">Ev hijyeni, neşeli temizlik ipuçları ve profesyonel çözümler üzerine pratik bilgiler öğren!</p>
                         <div class="mode-play-btn">
                             Soruya Geç <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+
+                    <!-- Mod 4: Kelime Avı (Yeni) -->
+                    <div class="mode-card card-word" id="start-word-btn" style="background: rgba(251, 191, 36, 0.04); border-color: rgba(251, 191, 36, 0.15);">
+                        <div class="mode-card-badge" style="background: #fbbf24; color: #05160e;">ZEKİ</div>
+                        <div class="mode-icon-wrapper" style="color: #fbbf24;">
+                            <i class="fas fa-font"></i>
+                        </div>
+                        <h2 class="mode-title">Kelime Avı</h2>
+                        <p class="mode-desc">Karışık harflerden anlamlı temizlik kelimelerini birleştirin, kelime haznenizi ve zekanızı geliştirin!</p>
+                        <div class="mode-play-btn" style="color: #fbbf24;">
+                            Harfleri Çöz <i class="fas fa-arrow-right"></i>
                         </div>
                     </div>
                 </div>
@@ -107,6 +133,148 @@
                     
                     <div class="levels-grid" id="levels-grid-container">
                         <!-- 15 Seviye butonu JS ile buraya dinamik eklenecek -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 1C. YAPBOZ KURULUM VE SEÇİM EKRANI (Yeni) -->
+            <section id="screen-puzzle-setup" class="game-screen">
+                <div class="game-control-bar">
+                    <button id="puzzle-setup-back-btn" class="text-btn">
+                        <i class="fas fa-chevron-left"></i> Ana Menü
+                    </button>
+                    <div class="screen-title-badge">Yapboz Kurulumu</div>
+                    <div style="width: 50px;"></div>
+                </div>
+
+                <div class="puzzle-setup-container animate-fade-in">
+                    <h2 class="section-title">Yapbozunu Tasarla</h2>
+                    <p class="section-subtitle">Oynamak istediğiniz ürünü ve zorluk seviyesini seçin!</p>
+                    
+                    <!-- Zorluk Seviyesi -->
+                    <div class="setup-group">
+                        <h3 class="group-title"><i class="fas fa-sliders-h"></i> Zorluk Seviyesi</h3>
+                        <div class="difficulty-options">
+                            <button class="diff-btn active" data-grid="3">
+                                <span class="diff-title">Kolay</span>
+                                <span class="diff-desc">3 x 3 (9 Parça)</span>
+                            </button>
+                            <button class="diff-btn" data-grid="4">
+                                <span class="diff-title">Orta</span>
+                                <span class="diff-desc">4 x 4 (16 Parça)</span>
+                            </button>
+                            <button class="diff-btn" data-grid="5">
+                                <span class="diff-title">Zor</span>
+                                <span class="diff-desc">5 x 5 (25 Parça)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Ürün Görseli Seçimi -->
+                    <div class="setup-group">
+                        <h3 class="group-title"><i class="fas fa-images"></i> Ürün Görseli Seç</h3>
+                        <div class="image-gallery" id="puzzle-gallery-container">
+                            <div class="gallery-card active" data-img="https://resim.chooktemiz.com/stoklar/ChookShirin.png">
+                                <img src="https://resim.chooktemiz.com/stoklar/ChookShirin.png" alt="Chook Şirin">
+                                <span class="gallery-label">Chook Şirin Maskot</span>
+                            </div>
+                            <div class="gallery-card" data-img="https://resim.chooktemiz.com/stoklar/L0012.jpg">
+                                <img src="https://resim.chooktemiz.com/stoklar/L0012.jpg" alt="Arap Sabunu" onerror="this.src='https://resim.chooktemiz.com/stoklar/ChookShirin.png'">
+                                <span class="gallery-label">Sıvı Arap Sabunu</span>
+                            </div>
+                            <div class="gallery-card" data-img="https://resim.chooktemiz.com/stoklar/L0011.jpg">
+                                <img src="https://resim.chooktemiz.com/stoklar/L0011.jpg" alt="Leke Çıkarıcı" onerror="this.src='https://resim.chooktemiz.com/stoklar/ChookShirin.png'">
+                                <span class="gallery-label">Leke Çıkarıcı</span>
+                            </div>
+                            <div class="gallery-card" data-img="https://resim.chooktemiz.com/stoklar/L0013.jpg">
+                                <img src="https://resim.chooktemiz.com/stoklar/L0013.jpg" alt="Yüzey Temizleyici" onerror="this.src='https://resim.chooktemiz.com/stoklar/ChookShirin.png'">
+                                <span class="gallery-label">Yüzey Temizleyici</span>
+                            </div>
+                            <div class="gallery-card" data-img="https://resim.chooktemiz.com/stoklar/L0014.jpg">
+                                <img src="https://resim.chooktemiz.com/stoklar/L0014.jpg" alt="Ultra Deterjan" onerror="this.src='https://resim.chooktemiz.com/stoklar/ChookShirin.png'">
+                                <span class="gallery-label">Ultra Deterjan</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="start-puzzle-game-btn" class="primary-btn wide-btn" style="margin-top: 1rem; padding: 1.1rem; box-shadow: 0 4px 15px rgba(16,185,129,0.3);">
+                        <i class="fas fa-play"></i> Yapbozu Başlat!
+                    </button>
+                </div>
+            </section>
+
+            <!-- 1D. YAPBOZ OYUN EKRANI (Yeni) -->
+            <section id="screen-puzzle" class="game-screen">
+                <div class="game-control-bar">
+                    <button id="puzzle-game-back-btn" class="text-btn">
+                        <i class="fas fa-chevron-left"></i> Vazgeç
+                    </button>
+                    <div class="screen-title-badge" id="puzzle-title-badge">Yapboz (3x3)</div>
+                    <div class="game-timer">
+                        <i class="far fa-clock"></i> <span id="puzzle-timer">0</span>s
+                    </div>
+                </div>
+
+                <div class="game-stats-subbar">
+                    <div class="stat-item">
+                        <span class="stat-label">Hamle:</span>
+                        <span class="stat-value" id="puzzle-moves">0</span>
+                    </div>
+                    <button id="puzzle-hint-btn" class="secondary-btn compact-btn">
+                        <i class="fas fa-eye"></i> Resmi Göster
+                    </button>
+                </div>
+
+                <!-- Yapboz Tahtası -->
+                <div class="puzzle-board-wrapper">
+                    <div id="puzzle-board">
+                        <!-- Parçalar JS ile buraya eklenecek -->
+                    </div>
+                    <!-- Önizleme Katmanı -->
+                    <div id="puzzle-preview-overlay" class="puzzle-preview-overlay hidden">
+                        <img id="puzzle-preview-img" src="" alt="Önizleme">
+                        <div class="preview-text">Referans Görsel</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 1E. KELİME AVI OYUN EKRANI (Yeni) -->
+            <section id="screen-word" class="game-screen">
+                <div class="game-control-bar">
+                    <button id="word-game-back-btn" class="text-btn">
+                        <i class="fas fa-chevron-left"></i> Vazgeç
+                    </button>
+                    <div class="screen-title-badge" id="word-title-badge">Kelime Avı (1/10)</div>
+                    <div class="game-timer">
+                        <i class="far fa-clock"></i> <span id="word-timer">0</span>s
+                    </div>
+                </div>
+
+                <div class="word-game-container animate-fade-in">
+                    <!-- İpucu / Kategori başlığı -->
+                    <div class="word-hint-card">
+                        <div class="word-category"><i class="fas fa-lightbulb" style="color: #fbbf24;"></i> İpucu & Tanım</div>
+                        <p class="word-hint-text" id="word-hint-desc">Doğadan ilham alan, evimizi parıldatan temizlik markamız.</p>
+                    </div>
+
+                    <!-- Boş Harf Kutucukları -->
+                    <div class="word-slots-container" id="word-slots">
+                        <!-- Kutular dinamik olarak buraya eklenecek -->
+                    </div>
+
+                    <!-- Karıştırılmış Harf Havuzu -->
+                    <div class="word-letters-pool" id="word-letters-pool">
+                        <!-- Harfler buraya eklenecek -->
+                    </div>
+
+                    <!-- Kontroller -->
+                    <div class="word-controls">
+                        <button id="word-clear-btn" class="secondary-btn compact-btn">
+                            <i class="fas fa-undo"></i> Temizle
+                        </button>
+                        <button id="word-shuffle-btn" class="secondary-btn compact-btn">
+                            <i class="fas fa-random"></i> Harfleri Karıştır
+                        </button>
                     </div>
                 </div>
             </section>
@@ -229,6 +397,7 @@
                 </div>
                 <div class="modal-footer horizontal">
                     <button id="result-retry-btn" class="secondary-btn"><i class="fas fa-redo"></i> Yeniden</button>
+                    <button id="result-next-btn" class="primary-btn hidden" style="background: var(--grad-chook); box-shadow: 0 4px 15px rgba(16,185,129,0.3);"><i class="fas fa-arrow-right"></i> Sonraki</button>
                     <button id="result-home-btn" class="primary-btn"><i class="fas fa-home"></i> Ana Menü</button>
                 </div>
             </div>

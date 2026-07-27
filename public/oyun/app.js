@@ -145,6 +145,25 @@ let currentQuestionIndex = 0;
 let triviaScore = 0;
 let isTriviaLocked = false;
 
+// Yapboz Oyunu Durumu
+let puzzleGridSize = 3;
+let puzzleSelectedImg = "https://resim.chooktemiz.com/stoklar/ChookShirin.png";
+let puzzlePieces = [];
+let puzzleSelectedPieceIndex = null;
+let puzzleMoves = 0;
+let puzzleTimer = 0;
+let puzzleTimerInterval = null;
+let isPuzzleCompleted = false;
+
+// Kelime Avı Durumu
+let currentWordIndex = 0;
+let activeWordObj = null;
+let wordUserSelections = [];
+let wordLetters = [];
+let wordTimer = 0;
+let wordTimerInterval = null;
+let isWordCompleted = false;
+
 // 4. SAYFA YÜKLENİRKEN ÇALIŞACAK KODLAR
 document.addEventListener("DOMContentLoaded", () => {
     initUI();
@@ -169,6 +188,16 @@ function setupEventListeners() {
     // Dashboard -> Mod Girişleri
     document.getElementById("start-memory-btn").addEventListener("click", () => switchScreen("levels"));
     document.getElementById("start-trivia-btn").addEventListener("click", () => switchScreen("trivia"));
+    
+    const startPuzzleBtn = document.getElementById("start-puzzle-btn");
+    if (startPuzzleBtn) {
+        startPuzzleBtn.addEventListener("click", () => switchScreen("puzzle-setup"));
+    }
+    
+    const startWordBtn = document.getElementById("start-word-btn");
+    if (startWordBtn) {
+        startWordBtn.addEventListener("click", () => switchScreen("word"));
+    }
 
     // Logo Tıklama (Ana Sayfaya Dönüş)
     document.getElementById("logo-btn").addEventListener("click", () => switchScreen("dashboard"));
@@ -177,9 +206,35 @@ function setupEventListeners() {
     document.getElementById("levels-back-btn").addEventListener("click", () => switchScreen("dashboard"));
     document.getElementById("memory-back-btn").addEventListener("click", () => switchScreen("levels"));
     
+    const puzzleSetupBackBtn = document.getElementById("puzzle-setup-back-btn");
+    if (puzzleSetupBackBtn) {
+        puzzleSetupBackBtn.addEventListener("click", () => switchScreen("dashboard"));
+    }
+    
+    const puzzleGameBackBtn = document.getElementById("puzzle-game-back-btn");
+    if (puzzleGameBackBtn) {
+        puzzleGameBackBtn.addEventListener("click", () => switchScreen("puzzle-setup"));
+    }
+    
+    const wordGameBackBtn = document.getElementById("word-game-back-btn");
+    if (wordGameBackBtn) {
+        wordGameBackBtn.addEventListener("click", () => switchScreen("dashboard"));
+    }
+
     document.querySelectorAll(".back-to-dashboard-btn").forEach(btn => {
         btn.addEventListener("click", () => switchScreen("dashboard"));
     });
+
+    // Word Oyunu Kontrolleri
+    const wordClearBtn = document.getElementById("word-clear-btn");
+    if (wordClearBtn) {
+        wordClearBtn.addEventListener("click", clearWordRound);
+    }
+    
+    const wordShuffleBtn = document.getElementById("word-shuffle-btn");
+    if (wordShuffleBtn) {
+        wordShuffleBtn.addEventListener("click", shufflePoolLetters);
+    }
 
     // Modallardan Çıkış ve Menü Butonları
     document.getElementById("close-tip-btn").addEventListener("click", closeTipModal);
@@ -188,6 +243,29 @@ function setupEventListeners() {
         switchScreen("dashboard");
     });
     document.getElementById("result-retry-btn").addEventListener("click", restartCurrentGame);
+
+    // Sonraki Seviye / Aşama Butonu (Açık ve Akıcı Otomatik Geçiş)
+    const resultNextBtn = document.getElementById("result-next-btn");
+    if (resultNextBtn) {
+        resultNextBtn.addEventListener("click", () => {
+            closeResultModal();
+            if (activeScreen === "memory") {
+                const nextLvl = currentSelectedLevel + 1;
+                if (nextLvl <= 15) {
+                    switchScreen("memory", nextLvl);
+                }
+            } else if (activeScreen === "word") {
+                const nextWord = currentWordIndex + 1;
+                if (nextWord < WORD_POOL.length) {
+                    loadWordRound(nextWord);
+                } else {
+                    switchScreen("dashboard");
+                }
+            } else if (activeScreen === "puzzle") {
+                switchScreen("puzzle-setup");
+            }
+        });
+    }
 }
 
 // 6. TEMA VE EKRAN DEĞİŞTİRME MANTIĞI
@@ -210,8 +288,10 @@ function toggleTheme() {
 }
 
 function switchScreen(screenName, levelNum = null) {
-    // Önceki ekranların zamanlayıcılarını ve durumlarını temizle
+    // Önceki tüm ekranların zamanlayıcılarını ve durumlarını temizle
     stopMemoryTimer();
+    stopPuzzleTimer();
+    stopWordTimer();
     
     // Tüm ekranları gizle
     document.querySelectorAll(".game-screen").forEach(screen => {
@@ -232,6 +312,12 @@ function switchScreen(screenName, levelNum = null) {
         startMemoryGame(levelNum || currentSelectedLevel);
     } else if (screenName === "trivia") {
         startTriviaGame();
+    } else if (screenName === "puzzle-setup") {
+        initPuzzleSetupScreen();
+    } else if (screenName === "puzzle") {
+        startPuzzleGame();
+    } else if (screenName === "word") {
+        startWordGame();
     }
 }
 
@@ -556,11 +642,7 @@ function winMemoryGame() {
     const retryBtn = document.getElementById("result-retry-btn");
     const homeBtn = document.getElementById("result-home-btn");
 
-    if (currentSelectedLevel < 15) {
-        retryBtn.innerHTML = '<i class="fas fa-arrow-right"></i> Sıradaki Seviye';
-    } else {
-        retryBtn.innerHTML = '<i class="fas fa-redo"></i> Seviye 15\'i Tekrar Et';
-    }
+    retryBtn.innerHTML = '<i class="fas fa-redo"></i> Yeniden';
     homeBtn.innerHTML = '<i class="fas fa-th"></i> Seviyeler';
 
     // Yıldız ikonlarını hazırla
@@ -579,7 +661,8 @@ function winMemoryGame() {
             score: `+${totalWinPoints}`,
             secLabel: "Kalan Süre",
             secVal: `${memoryTimeRemaining} sn`,
-            promo: randomTip.tip
+            promo: randomTip.tip,
+            hasNextLevel: currentSelectedLevel < 15
         });
     });
 }
@@ -757,10 +840,20 @@ function showResultModal(config) {
     document.getElementById("result-secondary-val").textContent = config.secVal;
     document.getElementById("result-promo-text").innerHTML = `<strong>Tavsiye:</strong> ${config.promo}`;
 
+    // Sonraki Seviye Butonu Kontrolü
+    const nextBtn = document.getElementById("result-next-btn");
+    if (nextBtn) {
+        if (config.hasNextLevel) {
+            nextBtn.classList.remove("hidden");
+        } else {
+            nextBtn.classList.add("hidden");
+        }
+    }
+
     modal.classList.add("active");
 
     // Eğer kazanılan puan varsa konfeti yağdır!
-    if (config.score !== "+0") {
+    if (config.score !== "+0" && config.score !== "0") {
         triggerConfetti();
     }
 }
@@ -774,9 +867,13 @@ function closeResultModal() {
 function restartCurrentGame() {
     closeResultModal();
     if (activeScreen === "memory") {
-        startMemoryGame();
+        startMemoryGame(currentSelectedLevel);
     } else if (activeScreen === "trivia") {
         startTriviaGame();
+    } else if (activeScreen === "puzzle") {
+        startPuzzleGame();
+    } else if (activeScreen === "word") {
+        loadWordRound(currentWordIndex);
     }
 }
 
@@ -860,3 +957,535 @@ function triggerConfetti() {
         });
     }
 }
+
+// ==========================================================================
+// YAPBOZ OYUN MOTORU (PUZZLE ENGINE)
+// ==========================================================================
+
+// Yapboz Kurulum Ekranını İlklendir
+function initPuzzleSetupScreen() {
+    // Zorluk butonu tıklamaları
+    const diffButtons = document.querySelectorAll(".diff-btn");
+    diffButtons.forEach(btn => {
+        btn.onclick = (e) => {
+            diffButtons.forEach(b => b.classList.remove("active"));
+            const target = e.currentTarget;
+            target.classList.add("active");
+            puzzleGridSize = parseInt(target.getAttribute("data-grid"));
+        };
+    });
+
+    // Görsel kartı tıklamaları
+    const galleryCards = document.querySelectorAll(".gallery-card");
+    galleryCards.forEach(card => {
+        card.onclick = (e) => {
+            galleryCards.forEach(c => c.classList.remove("active"));
+            const target = e.currentTarget;
+            target.classList.add("active");
+            puzzleSelectedImg = target.getAttribute("data-img");
+        };
+    });
+
+    // Yapbozu Başlat Butonu
+    const startBtn = document.getElementById("start-puzzle-game-btn");
+    if (startBtn) {
+        startBtn.onclick = () => switchScreen("puzzle");
+    }
+}
+
+// Yapbozu Başlat
+function startPuzzleGame() {
+    isPuzzleCompleted = false;
+    puzzleMoves = 0;
+    puzzleTimer = 0;
+    puzzleSelectedPieceIndex = null;
+    document.getElementById("puzzle-moves").textContent = puzzleMoves;
+    document.getElementById("puzzle-timer").textContent = puzzleTimer;
+
+    // Seviye başlığı güncelle
+    document.getElementById("puzzle-title-badge").textContent = `Yapboz (${puzzleGridSize}x${puzzleGridSize})`;
+
+    // Önizleme görselini güncelle
+    document.getElementById("puzzle-preview-img").src = puzzleSelectedImg;
+
+    // Zamanlayıcıyı Başlat
+    stopPuzzleTimer();
+    puzzleTimerInterval = setInterval(() => {
+        puzzleTimer++;
+        document.getElementById("puzzle-timer").textContent = puzzleTimer;
+    }, 1000);
+
+    // Parçaları oluştur ve karıştır
+    initPuzzleBoard();
+
+    // Önizleme ve İpucu Butonu Olayları
+    setupPuzzleHintEvents();
+}
+
+// Zamanlayıcıyı durdur
+function stopPuzzleTimer() {
+    if (puzzleTimerInterval) {
+        clearInterval(puzzleTimerInterval);
+        puzzleTimerInterval = null;
+    }
+}
+
+// Parçaları oluştur ve tahtaya çiz
+function initPuzzleBoard() {
+    const board = document.getElementById("puzzle-board");
+    board.className = ""; // Eski sınıfları temizle
+    board.style.gridTemplateColumns = `repeat(${puzzleGridSize}, 1fr)`;
+    board.style.gridTemplateRows = `repeat(${puzzleGridSize}, 1fr)`;
+    board.innerHTML = "";
+
+    const totalPieces = puzzleGridSize * puzzleGridSize;
+    puzzlePieces = [];
+
+    // Önce doğru sıralı parçaları üret
+    for (let i = 0; i < totalPieces; i++) {
+        puzzlePieces.push({
+            correctIndex: i,
+            currentIndex: i
+        });
+    }
+
+    // Parçaları karıştır
+    shuffleArray(puzzlePieces);
+
+    // Tahtaya çiz
+    renderPuzzleBoard();
+}
+
+// Parçaları Tahtaya Render Et
+function renderPuzzleBoard() {
+    const board = document.getElementById("puzzle-board");
+    board.innerHTML = "";
+
+    puzzlePieces.forEach((piece, index) => {
+        const div = document.createElement("div");
+        div.classList.add("puzzle-piece");
+        div.setAttribute("data-index", index);
+
+        // CSS Arka Plan Dilimi Ayarla
+        const r = Math.floor(piece.correctIndex / puzzleGridSize);
+        const c = piece.correctIndex % puzzleGridSize;
+
+        const sizePercent = puzzleGridSize * 100;
+        const step = 100 / (puzzleGridSize - 1);
+        const posX = (c * step).toFixed(4);
+        const posY = (r * step).toFixed(4);
+
+        div.style.backgroundImage = `url("${puzzleSelectedImg}")`;
+        div.style.backgroundSize = `${sizePercent}% ${sizePercent}%`;
+        div.style.backgroundPosition = `${posX}% ${posY}%`;
+
+        // Eğer bu parça seçilmişse işaretle
+        if (puzzleSelectedPieceIndex === index) {
+            div.classList.add("selected");
+        }
+
+        // Tıklama Olayı
+        div.onclick = () => handlePieceClick(index);
+
+        board.appendChild(div);
+    });
+}
+
+// Parça Tıklama İşleme (Takas Mantığı)
+function handlePieceClick(index) {
+    if (isPuzzleCompleted) return;
+
+    if (puzzleSelectedPieceIndex === null) {
+        // İlk parçayı seç
+        puzzleSelectedPieceIndex = index;
+        renderPuzzleBoard();
+    } else {
+        if (puzzleSelectedPieceIndex === index) {
+            // Aynı parçaya tıklandı, seçimi iptal et
+            puzzleSelectedPieceIndex = null;
+            renderPuzzleBoard();
+            return;
+        }
+
+        // İki parçayı takas et!
+        const firstIndex = puzzleSelectedPieceIndex;
+        const secondIndex = index;
+
+        // Geçici takas işlemi
+        const temp = puzzlePieces[firstIndex];
+        puzzlePieces[firstIndex] = puzzlePieces[secondIndex];
+        puzzlePieces[secondIndex] = temp;
+
+        puzzleMoves++;
+        document.getElementById("puzzle-moves").textContent = puzzleMoves;
+
+        puzzleSelectedPieceIndex = null; // Seçimi temizle
+        renderPuzzleBoard();
+
+        // Çözüldü mü kontrol et
+        checkPuzzleCompletion();
+    }
+}
+
+// Yapboz Tamamlandı mı Kontrol Et
+function checkPuzzleCompletion() {
+    let allCorrect = true;
+    for (let i = 0; i < puzzlePieces.length; i++) {
+        if (puzzlePieces[i].correctIndex !== i) {
+            allCorrect = false;
+            break;
+        }
+    }
+
+    if (allCorrect) {
+        isPuzzleCompleted = true;
+        stopPuzzleTimer();
+
+        setTimeout(() => {
+            const basePoints = puzzleGridSize === 3 ? 100 : (puzzleGridSize === 4 ? 200 : 350);
+            const timeBonus = Math.max(0, 120 - puzzleTimer);
+            const moveBonus = Math.max(0, 50 - puzzleMoves) * 2;
+            const pointsEarned = basePoints + timeBonus + moveBonus;
+
+            playerTotalScore += pointsEarned;
+            localStorage.setItem("chook_score", playerTotalScore);
+            document.getElementById("player-score").textContent = playerTotalScore;
+
+            showResultModal({
+                title: "Yapboz Çözüldü!",
+                subtitle: `<div style="margin-bottom: 8px;">Tebrikler! ${puzzleGridSize}x${puzzleGridSize} yapbozu başarıyla tamamladın!</div>`,
+                score: `+${pointsEarned}`,
+                secLabel: "Hamle Sayısı",
+                secVal: `${puzzleMoves}`,
+                promo: "Yapboz çözmek zihinsel görselleştirme ve mekansal zeka becerilerini geliştirir. Chook Temiz ile parlamaya devam et!",
+                hasNextLevel: true // Tekrar oynamak üzere kuruluma geçiş butonunu gösterecektir
+            });
+        }, 800);
+    }
+}
+
+// İpucu Butonu Olayları (Basılı tutunca resmi göster)
+function setupPuzzleHintEvents() {
+    const hintBtn = document.getElementById("puzzle-hint-btn");
+    const previewOverlay = document.getElementById("puzzle-preview-overlay");
+
+    if (hintBtn && previewOverlay) {
+        const showHint = () => {
+            previewOverlay.classList.remove("hidden");
+            previewOverlay.style.opacity = "1";
+        };
+
+        const hideHint = () => {
+            previewOverlay.style.opacity = "0";
+            setTimeout(() => {
+                if (previewOverlay.style.opacity === "0") {
+                    previewOverlay.classList.add("hidden");
+                }
+            }, 300);
+        };
+
+        // Desktop
+        hintBtn.onmousedown = showHint;
+        hintBtn.onmouseup = hideHint;
+        hintBtn.onmouseleave = hideHint;
+
+        // Mobile
+        hintBtn.ontouchstart = (e) => {
+            e.preventDefault();
+            showHint();
+        };
+        hintBtn.ontouchend = hideHint;
+    }
+}
+
+// ==========================================================================
+// KELİME AVI OYUN MOTORU (WORD CONNECT ENGINE)
+// ==========================================================================
+
+const WORD_POOL = [
+    {
+        word: "CHOOK",
+        hint: "Doğadan ilham alan, her yeri ışıl ışıl parıldatan neşeli temizlik markamız.",
+        tip: "Chook Temiz, doğaya ve geleceğe değer veren vegan formülleriyle evinizi neşeyle parlatır!"
+    },
+    {
+        word: "TEMİZ",
+        hint: "Evlerimizin hijyenik, lekesiz, ferah ve pırıl pırıl olma durumu.",
+        tip: "Temiz bir ev, sakin bir zihnin en önemli destekçisidir."
+    },
+    {
+        word: "SABUN",
+        hint: "Geleneksel temizlikte sıvı Arap formuyla çok sevilen doğal köpüklü temizleyici.",
+        tip: "Chook Sıvı Arap Sabunu, tüm yüzeylerde iz bırakmadan geleneksel temizlik ve parlaklık sunar."
+    },
+    {
+        word: "KÖPÜK",
+        hint: "Deterjanın suyla birleştiğinde oluşturduğu, temizliği hissettiren hafif beyaz baloncuklar.",
+        tip: "Bol köpük neşeli temizlik demektir! Chook deterjanları az bir miktar ile bol köpürür."
+    },
+    {
+        word: "HİJYEN",
+        hint: "Bakteri ve mikroplardan arınmış, sağlığımızı koruyan kusursuz temizlik standardı.",
+        tip: "Mutfak ve banyo gibi temasın yüksek olduğu alanlarda Chook hijyen çözümleri üstün koruma sağlar."
+    },
+    {
+        word: "DOĞAL",
+        hint: "Formüllerimizde sentetik kimyasallar yerine bitkisel ve saf özler tercih etmemiz.",
+        tip: "Chook Temiz ürünleri, doğadan ilham alan doğal içerikleriyle evcil hayvanlarınız için güvenlidir."
+    },
+    {
+        word: "ÇAMAŞIR",
+        hint: "Mis kokulu yumuşatıcılar ve renk koruyucu deterjanlarla yıkadığımız giysilerimiz.",
+        tip: "Çamaşırları yıkarken Chook deterjanları renklerin ilk günkü gibi canlı kalmasını sağlar."
+    },
+    {
+        word: "PARLAK",
+        hint: "Camların, aynaların ve zeminlerin tozsuz, lekesiz ve pürüzsüzce ışığı yansıtması.",
+        tip: "Mikrofiber bez ile dairesel hareketlerle toz almak yüzeylerin uzun süre parlak kalmasını sağlar."
+    },
+    {
+        word: "LAVANTA",
+        hint: "Chook temizleyicilerinde bulunan, mor çiçekli bitkiden elde edilen dinlendirici koku özü.",
+        tip: "Lavanta kokusu, temizlik sonrası evinizde stresi azaltan, huzurlu bir atmosfer yaratır."
+    },
+    {
+        word: "FİLİZ",
+        hint: "Doğanın uyanışını, yeşermeyi ve çevre dostu felsefemizi temsil eden taze sürgün.",
+        tip: "Gelecek nesillere daha yeşil bir dünya bırakmak için Chook olarak çevreye duyarlı ambalajlar kullanıyoruz."
+    }
+];
+
+// Kelime Avı Oyununu Başlat
+function startWordGame() {
+    currentWordIndex = 0;
+    isWordCompleted = false;
+    loadWordRound(0);
+}
+
+// Zamanlayıcıyı Durdur
+function stopWordTimer() {
+    if (wordTimerInterval) {
+        clearInterval(wordTimerInterval);
+        wordTimerInterval = null;
+    }
+}
+
+// Belirli bir kelime turunu yükle
+function loadWordRound(index) {
+    if (index < 0 || index >= WORD_POOL.length) {
+        switchScreen("dashboard");
+        return;
+    }
+
+    currentWordIndex = index;
+    activeWordObj = WORD_POOL[index];
+    wordUserSelections = [];
+    isWordCompleted = false;
+    wordTimer = 0;
+
+    // Arayüz Değerleri
+    document.getElementById("word-title-badge").textContent = `Kelime Avı (${index + 1}/${WORD_POOL.length})`;
+    document.getElementById("word-hint-desc").textContent = activeWordObj.hint;
+    document.getElementById("word-timer").textContent = wordTimer;
+
+    // Timer Başlat
+    stopWordTimer();
+    wordTimerInterval = setInterval(() => {
+        wordTimer++;
+        document.getElementById("word-timer").textContent = wordTimer;
+    }, 1000);
+
+    // Harfleri diziye böl, karıştır
+    const wordStr = activeWordObj.word.toUpperCase();
+    const charsArray = wordStr.split("");
+    
+    // Karıştırma işlemi
+    let shuffledChars = [...charsArray];
+    let attempts = 0;
+    while (shuffledChars.join("") === wordStr && attempts < 10) {
+        shuffleArray(shuffledChars);
+        attempts++;
+    }
+
+    // Harf nesnelerini oluştur
+    wordLetters = shuffledChars.map((char, idx) => ({
+        char: char,
+        poolIndex: idx,
+        isUsed: false
+    }));
+
+    // Ekranı Çiz
+    renderWordSlots();
+    renderLettersPool();
+}
+
+// Boş Yuvaları Çiz
+function renderWordSlots() {
+    const slotsContainer = document.getElementById("word-slots");
+    slotsContainer.innerHTML = "";
+
+    const correctWord = activeWordObj.word;
+
+    for (let i = 0; i < correctWord.length; i++) {
+        const slotDiv = document.createElement("div");
+        slotDiv.classList.add("word-slot");
+        slotDiv.setAttribute("data-slot-index", i);
+
+        // Eğer bu yuvada bir harf seçilmişse göster
+        if (i < wordUserSelections.length) {
+            const poolIndex = wordUserSelections[i];
+            slotDiv.textContent = wordLetters[poolIndex].char;
+            slotDiv.classList.add("filled");
+
+            // Tıklayınca bu harfi iptal etsin (Geri alsın)
+            slotDiv.onclick = () => handleSlotClick(i);
+        }
+
+        slotsContainer.appendChild(slotDiv);
+    }
+}
+
+// Harf Havuzunu Çiz
+function renderLettersPool() {
+    const poolContainer = document.getElementById("word-letters-pool");
+    poolContainer.innerHTML = "";
+
+    wordLetters.forEach((letterObj) => {
+        const letterDiv = document.createElement("div");
+        letterDiv.classList.add("word-letter");
+        letterDiv.textContent = letterObj.char;
+        letterDiv.setAttribute("data-pool-index", letterObj.poolIndex);
+
+        if (letterObj.isUsed) {
+            letterDiv.classList.add("used");
+        } else {
+            letterDiv.onclick = () => handlePoolLetterClick(letterObj.poolIndex);
+        }
+
+        poolContainer.appendChild(letterDiv);
+    });
+}
+
+// Havuzdaki Harfe Tıklama
+function handlePoolLetterClick(poolIndex) {
+    if (isWordCompleted) return;
+
+    const letterObj = wordLetters[poolIndex];
+    if (letterObj.isUsed) return;
+
+    if (wordUserSelections.length < activeWordObj.word.length) {
+        letterObj.isUsed = true;
+        wordUserSelections.push(poolIndex);
+
+        renderWordSlots();
+        renderLettersPool();
+
+        // Kelime tamamlandı mı kontrol et
+        if (wordUserSelections.length === activeWordObj.word.length) {
+            checkWordSuccess();
+        }
+    }
+}
+
+// Hedef Slot'a Tıklayarak Harfi Geri Alma
+function handleSlotClick(slotIndex) {
+    if (isWordCompleted) return;
+
+    if (slotIndex < wordUserSelections.length) {
+        const poolIndex = wordUserSelections[slotIndex];
+        wordLetters[poolIndex].isUsed = false;
+        wordUserSelections.splice(slotIndex, 1);
+
+        renderWordSlots();
+        renderLettersPool();
+    }
+}
+
+// Harfleri Karıştır Butonu
+function shufflePoolLetters() {
+    if (isWordCompleted) return;
+
+    // Sadece kullanılmamış harfleri karıştır
+    const unusedLetters = wordLetters.filter(l => !wordUserSelections.includes(l.poolIndex));
+    const unusedIndices = unusedLetters.map(l => l.poolIndex);
+
+    let shuffledIndices = [...unusedIndices];
+    shuffleArray(shuffledIndices);
+
+    const newLetters = [...wordLetters];
+    unusedIndices.forEach((oldIdx, i) => {
+        newLetters[oldIdx] = wordLetters[shuffledIndices[i]];
+    });
+
+    wordLetters = newLetters;
+    renderLettersPool();
+}
+
+// Temizle Butonu
+function clearWordRound() {
+    if (isWordCompleted) return;
+
+    wordLetters.forEach(l => l.isUsed = false);
+    wordUserSelections = [];
+
+    renderWordSlots();
+    renderLettersPool();
+}
+
+// Kelimenin Doğruluğunu Kontrol Et
+function checkWordSuccess() {
+    const userWord = wordUserSelections.map(idx => wordLetters[idx].char).join("").toUpperCase();
+    const correctWord = activeWordObj.word.toUpperCase();
+
+    if (userWord === correctWord) {
+        isWordCompleted = true;
+        stopWordTimer();
+
+        setTimeout(() => {
+            const lengthBonus = correctWord.length * 25;
+            const timeBonus = Math.max(0, 45 - wordTimer) * 2;
+            const pointsEarned = lengthBonus + timeBonus;
+
+            playerTotalScore += pointsEarned;
+            localStorage.setItem("chook_score", playerTotalScore);
+            document.getElementById("player-score").textContent = playerTotalScore;
+
+            const isLastRound = currentWordIndex === WORD_POOL.length - 1;
+
+            showResultModal({
+                title: "Kelime Bulundu!",
+                subtitle: `<div style="margin-bottom: 8px;"><strong>${correctWord}</strong> kelimesini başarıyla birleştirdiniz!</div>`,
+                score: `+${pointsEarned}`,
+                secLabel: "Geçen Süre",
+                secVal: `${wordTimer} sn`,
+                promo: activeWordObj.tip,
+                hasNextLevel: !isLastRound
+            });
+        }, 600);
+    } else {
+        const slots = document.querySelectorAll(".word-slot");
+        slots.forEach(slot => {
+            slot.style.borderColor = "#ef4444";
+            slot.style.color = "#ef4444";
+            slot.animate([
+                { transform: "translateX(0)" },
+                { transform: "translateX(-6px)" },
+                { transform: "translateX(6px)" },
+                { transform: "translateX(-4px)" },
+                { transform: "translateX(4px)" },
+                { transform: "translateX(0)" }
+            ], {
+                duration: 400,
+                easing: "ease-in-out"
+            });
+        });
+
+        setTimeout(() => {
+            slots.forEach(slot => {
+                slot.style.borderColor = "";
+                slot.style.color = "";
+            });
+        }, 1000);
+    }
+}
+
