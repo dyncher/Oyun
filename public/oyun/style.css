@@ -1434,6 +1434,60 @@ body {
     z-index: 10;
 }
 
+.puzzle-piece.locked {
+    border-color: #10b981; /* Kilitli parça yeşil renkle sabitlenir */
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.25);
+    cursor: default;
+    pointer-events: none; /* Tıklanamaz ve taşınamaz */
+    position: relative;
+    transform: scale(1) !important;
+}
+
+/* Kilit simgesi */
+.piece-lock-indicator {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: rgba(16, 185, 129, 0.95);
+    color: #fff;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.55rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    animation: scaleInCheck 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes scaleInCheck {
+    0% { transform: scale(0); }
+    100% { transform: scale(1); }
+}
+
+/* Koordinat Filigranı (Beyaz Boşluk Sorununu Çözen Harika Tasarım) */
+.piece-coord {
+    position: absolute;
+    bottom: 4px;
+    left: 4px;
+    font-family: var(--font-heading);
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.22); /* Çok hafif, zarif, göze batmayan beyaz */
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1px 4px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    user-select: none;
+    pointer-events: none;
+}
+
+.puzzle-piece.locked .piece-coord {
+    color: rgba(16, 185, 129, 0.35); /* Kilitliyse hafif yeşil */
+    background: rgba(0,0,0,0.15);
+}
+
 @keyframes pulseSelected {
     0% { border-color: #fbbf24; box-shadow: 0 0 10px #fbbf24; }
     100% { border-color: var(--text-accent); box-shadow: 0 0 20px var(--text-accent); }

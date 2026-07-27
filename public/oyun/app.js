@@ -1049,8 +1049,20 @@ function initPuzzleBoard() {
         });
     }
 
-    // Parçaları karıştır
-    shuffleArray(puzzlePieces);
+    // Parçaları karıştır (En az üçte ikisinin yanlış yerde başlamasını garanti edelim ki çözme zevki yüksek olsun)
+    let attempts = 0;
+    let correctCount = totalPieces;
+    
+    while (correctCount > totalPieces / 3 && attempts < 100) {
+        shuffleArray(puzzlePieces);
+        correctCount = 0;
+        for (let i = 0; i < totalPieces; i++) {
+            if (puzzlePieces[i].correctIndex === i) {
+                correctCount++;
+            }
+        }
+        attempts++;
+    }
 
     // Tahtaya çiz
     renderPuzzleBoard();
@@ -1079,13 +1091,33 @@ function renderPuzzleBoard() {
         div.style.backgroundSize = `${sizePercent}% ${sizePercent}%`;
         div.style.backgroundPosition = `${posX}% ${posY}%`;
 
-        // Eğer bu parça seçilmişse işaretle
-        if (puzzleSelectedPieceIndex === index) {
+        // Kilitli (Doğru yerde) kontrolü
+        const isCorrect = piece.correctIndex === index;
+
+        if (isCorrect) {
+            div.classList.add("locked");
+            
+            // Kilit simgesi yerleştir
+            const lockIndicator = document.createElement("div");
+            lockIndicator.classList.add("piece-lock-indicator");
+            lockIndicator.innerHTML = '<i class="fas fa-check"></i>';
+            div.appendChild(lockIndicator);
+        } else if (puzzleSelectedPieceIndex === index) {
             div.classList.add("selected");
         }
 
-        // Tıklama Olayı
-        div.onclick = () => handlePieceClick(index);
+        // Koordinat filigranını yerleştir (Beyaz boşluklardaki imkansızlık sorununu kusursuz çözer)
+        const colLetter = String.fromCharCode(65 + c);
+        const rowNum = r + 1;
+        const coordSpan = document.createElement("span");
+        coordSpan.classList.add("piece-coord");
+        coordSpan.textContent = `${colLetter}${rowNum}`;
+        div.appendChild(coordSpan);
+
+        // Tıklama Olayı (Doğru yerdeki parça kilitlidir, tıklanamaz)
+        if (!isCorrect) {
+            div.onclick = () => handlePieceClick(index);
+        }
 
         board.appendChild(div);
     });
@@ -1094,6 +1126,10 @@ function renderPuzzleBoard() {
 // Parça Tıklama İşleme (Takas Mantığı)
 function handlePieceClick(index) {
     if (isPuzzleCompleted) return;
+
+    // Kilitli bir parça seçilemez veya taşınamaz
+    const clickedPiece = puzzlePieces[index];
+    if (clickedPiece.correctIndex === index) return;
 
     if (puzzleSelectedPieceIndex === null) {
         // İlk parçayı seç
@@ -1107,11 +1143,17 @@ function handlePieceClick(index) {
             return;
         }
 
-        // İki parçayı takas et!
         const firstIndex = puzzleSelectedPieceIndex;
         const secondIndex = index;
 
-        // Geçici takas işlemi
+        // Her ihtimale karşı her iki parçanın da kilitli olmadığını garanti edelim
+        if (puzzlePieces[firstIndex].correctIndex === firstIndex || puzzlePieces[secondIndex].correctIndex === secondIndex) {
+            puzzleSelectedPieceIndex = null;
+            renderPuzzleBoard();
+            return;
+        }
+
+        // İki parçayı takas et!
         const temp = puzzlePieces[firstIndex];
         puzzlePieces[firstIndex] = puzzlePieces[secondIndex];
         puzzlePieces[secondIndex] = temp;
