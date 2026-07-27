@@ -2742,8 +2742,8 @@ function setupPuzzleHintEvents() {
 
 // Kelime Avı Oyununu Başlat
 function startWordGame() {
-    // Kelime havuzunu her yeni oyunda karıştır
-    shuffleArray(WORD_POOL);
+    // Kelime havuzunu orijinal dil verisinden kopyalayıp her yeni oyunda taze bir şekilde karıştır
+    WORD_POOL = shuffleArray([...I18N_DATA[currentLanguage].word_pool]);
     currentWordIndex = 0;
     isWordCompleted = false;
     loadWordRound(0);
