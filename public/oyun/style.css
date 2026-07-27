@@ -1841,4 +1841,197 @@ body {
     color: var(--text-accent);
 }
 
+/* ==========================================================================
+   SOSYAL MEDYA PAYLAŞIM BÖLÜMÜ (SOCIAL MEDIA SHARE STYLES)
+   ========================================================================== */
+
+.social-share-fab {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #10B981, #0B3C2A);
+    color: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.35rem;
+    cursor: pointer;
+    z-index: 999;
+    transition: all var(--transition-normal);
+}
+
+.social-share-fab:hover {
+    transform: translateY(-4px) scale(1.1);
+    box-shadow: 0 12px 40px rgba(16, 185, 129, 0.6), 0 0 15px rgba(255,255,255,0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.social-share-fab i {
+    transition: transform 0.3s ease;
+}
+
+.social-share-fab:hover i {
+    transform: rotate(-15deg);
+}
+
+/* Sosyal Paylaşım Paneli / Tepsisi */
+.social-share-tray {
+    position: fixed;
+    bottom: 96px;
+    right: 24px;
+    background: rgba(11, 60, 42, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 20px;
+    border-radius: 24px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    z-index: 998;
+    width: 280px;
+    transform: translateY(20px) scale(0.95);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.social-share-tray.active {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.share-tray-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+}
+
+.share-tray-title {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+}
+
+.share-tray-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    font-size: 1rem;
+    transition: color 0.2s;
+}
+
+.share-tray-close:hover {
+    color: #ffffff;
+}
+
+.share-buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.share-btn-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s;
+    padding: 0;
+}
+
+.share-btn-item:hover {
+    transform: translateY(-3px);
+}
+
+.share-icon-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.share-label-text {
+    font-family: var(--font-main);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Paylaşım Butonu Renkleri */
+.share-whatsapp .share-icon-circle {
+    background: linear-gradient(135deg, #25D366, #128C7E);
+}
+.share-twitter .share-icon-circle {
+    background: linear-gradient(135deg, #1DA1F2, #0D8ECF);
+}
+.share-facebook .share-icon-circle {
+    background: linear-gradient(135deg, #1877F2, #0E5FC2);
+}
+.share-copy .share-icon-circle {
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+}
+
+/* Toast Bildirim */
+.share-toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(50px);
+    background: rgba(11, 60, 42, 0.95);
+    border: 1.5px solid #10B981;
+    color: #ffffff;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-family: var(--font-main);
+    font-weight: 700;
+    font-size: 0.85rem;
+    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.share-toast.active {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+@media (max-width: 576px) {
+    .social-share-fab {
+        bottom: 16px;
+        right: 16px;
+        width: 48px;
+        height: 48px;
+        font-size: 1.15rem;
+    }
+    .social-share-tray {
+        bottom: 80px;
+        right: 16px;
+        width: calc(100vw - 32px);
+        max-width: 320px;
+    }
+}
+
 

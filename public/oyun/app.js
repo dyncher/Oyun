@@ -2976,3 +2976,85 @@ function checkWordSuccess() {
     }
 }
 
+// ==========================================================================
+// SOSYAL MEDYA PAYLAŞIM MANTIĞI (SOCIAL MEDIA SHARING ENGINE)
+// ==========================================================================
+
+document.addEventListener("DOMContentLoaded", () => {
+    const shareFab = document.getElementById("social-share-fab");
+    const shareTray = document.getElementById("social-share-tray");
+    const shareClose = document.getElementById("social-share-close");
+    const shareToast = document.getElementById("share-toast");
+
+    if (!shareFab || !shareTray) return;
+
+    // Menüyü Aç / Kapat
+    shareFab.addEventListener("click", (e) => {
+        e.stopPropagation();
+        shareTray.classList.toggle("active");
+    });
+
+    shareClose.addEventListener("click", () => {
+        shareTray.classList.remove("active");
+    });
+
+    // Dışarı tıklayınca tepsiyi kapat
+    document.addEventListener("click", (e) => {
+        if (!shareTray.contains(e.target) && e.target !== shareFab && !shareFab.contains(e.target)) {
+            shareTray.classList.remove("active");
+        }
+    });
+
+    // Paylaşım Bilgilerini Belirle (Skora ve aktif ekrana göre dinamik)
+    function getShareData() {
+        const url = "https://oyun.chooktemiz.com/";
+        let text = "Chook Temiz Zeka Dünyası'nda eğlenceli temizlik zeka oyunları oynuyorum! Sen de sevimli kedi CHOX ile yarışmaya katıl: " + url;
+        
+        // Eğer oyuncu bir oyundaysa veya skoru varsa metni zenginleştir
+        if (playerTotalScore > 0) {
+            text = `Chook Temiz Zeka Dünyası'nda sevimli kedi CHOX ile zeka oyunları oynuyorum! Toplamda ${playerTotalScore} puan kazandım! Sen de bana katıl ve zihnini test et: ${url}`;
+        }
+        
+        return { url, text };
+    }
+
+    // WhatsApp Paylaş
+    document.getElementById("share-whatsapp").addEventListener("click", () => {
+        const { text } = getShareData();
+        const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+        window.open(whatsappUrl, "_blank");
+        shareTray.classList.remove("active");
+    });
+
+    // Twitter/X Paylaş
+    document.getElementById("share-twitter").addEventListener("click", () => {
+        const { text } = getShareData();
+        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+        window.open(twitterUrl, "_blank");
+        shareTray.classList.remove("active");
+    });
+
+    // Facebook Paylaş
+    document.getElementById("share-facebook").addEventListener("click", () => {
+        const { url, text } = getShareData();
+        const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`;
+        window.open(facebookUrl, "_blank");
+        shareTray.classList.remove("active");
+    });
+
+    // Link Kopyala (Toast Bildirimli)
+    document.getElementById("share-copy").addEventListener("click", () => {
+        const { url } = getShareData();
+        navigator.clipboard.writeText(url).then(() => {
+            // Toast Bildirimi Göster
+            shareToast.classList.add("active");
+            setTimeout(() => {
+                shareToast.classList.remove("active");
+            }, 2500);
+        }).catch(err => {
+            console.error("Kopyalama hatası:", err);
+        });
+        shareTray.classList.remove("active");
+    });
+});
+

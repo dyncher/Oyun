@@ -10,6 +10,20 @@
     <meta name="theme-color" content="#0B3C2A">
     <link rel="icon" type="image/png" href="assets/favicon.png">
     
+    <!-- Open Graph / Sosyal Medya Paylaşım Önizleme Etiketleri -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://oyun.chooktemiz.com/">
+    <meta property="og:title" content="Chook Temiz Zeka Dünyası | oyun.chooktemiz.com">
+    <meta property="og:description" content="Sevilen kedi maskotumuz CHOX ile eğlenceli temizlik zeka oyunları! Hafıza kartları, ürün yapbozları ve akıllı bilgi yarışmaları seni bekliyor.">
+    <meta property="og:image" content="https://oyun.chooktemiz.com/assets/chox_cat.png">
+
+    <!-- Twitter Card Önizleme Etiketleri -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://oyun.chooktemiz.com/">
+    <meta name="twitter:title" content="Chook Temiz Zeka Dünyası | oyun.chooktemiz.com">
+    <meta name="twitter:description" content="Sevilen kedi maskotumuz CHOX ile eğlenceli temizlik zeka oyunları! Hafıza kartları, ürün yapbozları ve akıllı bilgi yarışmaları seni bekliyor.">
+    <meta name="twitter:image" content="https://oyun.chooktemiz.com/assets/chox_cat.png">
+    
     <!-- Google Fonts (Outfit & Inter) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -431,6 +445,55 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- SOSYAL MEDYA PAYLAŞIM BILEŞENLERİ -->
+    <!-- 1. Yüzen Paylaşım Butonu (FAB) -->
+    <button id="social-share-fab" class="social-share-fab" aria-label="Oyunu Paylaş">
+        <i class="fas fa-share-nodes"></i>
+    </button>
+
+    <!-- 2. Paylaşım Seçenekleri Tepsisi (Tray) -->
+    <div id="social-share-tray" class="social-share-tray">
+        <div class="share-tray-header">
+            <span class="share-tray-title">Eğlenceyi Paylaş!</span>
+            <button id="social-share-close" class="share-tray-close" aria-label="Kapat"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="share-buttons-grid">
+            <!-- WhatsApp -->
+            <button id="share-whatsapp" class="share-btn-item share-whatsapp" aria-label="WhatsApp'ta Paylaş">
+                <div class="share-icon-circle">
+                    <i class="fab fa-whatsapp"></i>
+                </div>
+                <span class="share-label-text">WhatsApp</span>
+            </button>
+            <!-- Twitter/X -->
+            <button id="share-twitter" class="share-btn-item share-twitter" aria-label="Twitter X'te Paylaş">
+                <div class="share-icon-circle">
+                    <i class="fab fa-x-twitter"></i>
+                </div>
+                <span class="share-label-text">X / Twitter</span>
+            </button>
+            <!-- Facebook -->
+            <button id="share-facebook" class="share-btn-item share-facebook" aria-label="Facebook'ta Paylaş">
+                <div class="share-icon-circle">
+                    <i class="fab fa-facebook-f"></i>
+                </div>
+                <span class="share-label-text">Facebook</span>
+            </button>
+            <!-- Copy Link -->
+            <button id="share-copy" class="share-btn-item share-copy" aria-label="Bağlantıyı Kopyala">
+                <div class="share-icon-circle">
+                    <i class="fas fa-link"></i>
+                </div>
+                <span class="share-label-text">Kopyala</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 3. Kopyalandı Toast Mesajı -->
+    <div id="share-toast" class="share-toast">
+        <i class="fas fa-check-circle" style="color: #10B981; margin-right: 8px;"></i> Bağlantı Kopyalandı!
     </div>
 
     <!-- Oyun Mantığı JavaScript -->
