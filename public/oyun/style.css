@@ -1686,4 +1686,159 @@ body {
     width: 100%;
 }
 
+/* Trivia Seviye Seçim Ekranı */
+.trivia-levels-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 24px;
+    padding: 10px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.trivia-level-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    position: relative;
+    transition: all var(--transition-normal);
+    box-shadow: var(--card-shadow);
+    text-align: left;
+}
+
+.trivia-level-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(16, 185, 129, 0.4);
+    background: rgba(16, 185, 129, 0.05);
+}
+
+.trivia-level-card.locked {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.trivia-level-card.locked:hover {
+    transform: none;
+    border-color: var(--glass-border);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.trivia-level-info {
+    flex: 1;
+    padding-right: 15px;
+}
+
+.trivia-level-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.trivia-level-num {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text-accent);
+    font-family: var(--font-heading);
+}
+
+.trivia-level-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-main);
+    font-family: var(--font-heading);
+}
+
+.trivia-level-desc {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+.trivia-level-badges {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.trivia-badge {
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 8px;
+    text-transform: uppercase;
+}
+
+.trivia-badge.diff-easy { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.trivia-badge.diff-medium { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+.trivia-badge.diff-medium-hard { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+.trivia-badge.diff-hard { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.trivia-badge.diff-expert { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+
+.trivia-badge.points { background: rgba(255, 255, 255, 0.08); color: var(--text-main); }
+
+.trivia-level-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: #fff;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+    transition: all var(--transition-normal);
+}
+
+.trivia-level-card:hover .trivia-level-action {
+    transform: scale(1.1);
+    background: var(--text-accent);
+    color: #05160e;
+}
+
+.trivia-level-card.locked .trivia-level-action {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-muted);
+    box-shadow: none;
+}
+
+/* Dil Seçici Buton Stili */
+.lang-btn {
+    padding: 0 12px;
+    height: 40px;
+    border-radius: 20px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 800;
+    font-family: var(--font-heading);
+    box-shadow: var(--card-shadow);
+    transition: all var(--transition-normal);
+}
+
+.lang-btn:hover {
+    background: var(--glass-bg-hover);
+    border-color: var(--glass-border-hover);
+    transform: translateY(-2px);
+}
+
+.lang-btn i {
+    color: var(--text-accent);
+}
+
 
