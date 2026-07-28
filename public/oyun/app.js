@@ -3193,6 +3193,44 @@ function startRecycleGame() {
     });
 }
 
+function getBinUnderItem(itemEl) {
+    const itemRect = itemEl.getBoundingClientRect();
+    let matchedBin = null;
+    
+    document.querySelectorAll(".recycle-bin").forEach(bin => {
+        const binRect = bin.getBoundingClientRect();
+        
+        // Kesişim (intersection) alanını ölçelim
+        const overlapX = Math.max(0, Math.min(itemRect.right, binRect.right) - Math.max(itemRect.left, binRect.left));
+        const overlapY = Math.max(0, Math.min(itemRect.bottom, binRect.bottom) - Math.max(itemRect.top, binRect.top));
+        const overlapArea = overlapX * overlapY;
+        
+        if (overlapArea > 200) { // Belirgin bir temas olduğunda eşleştir
+            matchedBin = bin;
+        }
+    });
+    
+    return matchedBin;
+}
+
+function checkOverBins(itemEl) {
+    const itemRect = itemEl.getBoundingClientRect();
+    
+    document.querySelectorAll(".recycle-bin").forEach(bin => {
+        const binRect = bin.getBoundingClientRect();
+        
+        const overlapX = Math.max(0, Math.min(itemRect.right, binRect.right) - Math.max(itemRect.left, binRect.left));
+        const overlapY = Math.max(0, Math.min(itemRect.bottom, binRect.bottom) - Math.max(itemRect.top, binRect.top));
+        const overlapArea = overlapX * overlapY;
+        
+        if (overlapArea > 200) {
+            bin.classList.add("drag-over");
+        } else {
+            bin.classList.remove("drag-over");
+        }
+    });
+}
+
 function spawnRecycleItem() {
     const area = document.getElementById("recycle-game-area");
     if (!area || activeScreen !== "recycle") return;
@@ -3206,6 +3244,9 @@ function spawnRecycleItem() {
     itemEl.textContent = randomItem.emoji;
     itemEl.setAttribute("data-item-type", randomItem.type);
     
+    // Düşüş hızı kullanıcının talebi üzerine önemli ölçüde yavaşlatıldı (0.6 - 1.1 arası)
+    const speed = 0.5 + Math.random() * 0.5;
+    
     // Rastgele yatay pozisyon
     const xPos = Math.random() * (area.clientWidth - 50);
     itemEl.style.left = `${xPos}px`;
@@ -3214,39 +3255,138 @@ function spawnRecycleItem() {
     area.appendChild(itemEl);
     recycleActiveItems.push(itemEl);
     
-    // Tıklama ile Seçme
-    itemEl.onclick = (e) => {
-        e.stopPropagation();
-        if (selectedRecycleItem) {
-            selectedRecycleItem.style.border = "none";
-        }
-        selectedRecycleItem = itemEl;
-        itemEl.style.border = "2px dashed #3b82f6";
-        itemEl.style.borderRadius = "50px";
-        itemEl.style.padding = "4px";
+    let isDragging = false;
+    let startX, startY;
+    let initialLeft, initialTop;
+    
+    // Sürükleme Başlangıcı
+    const dragStart = (clientX, clientY) => {
+        isDragging = true;
+        startX = clientX;
+        startY = clientY;
+        initialLeft = parseFloat(itemEl.style.left);
+        initialTop = parseFloat(itemEl.style.top);
+        
+        itemEl.style.transform = "scale(1.35)";
+        itemEl.style.zIndex = "100";
+        itemEl.style.cursor = "grabbing";
     };
+    
+    itemEl.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        dragStart(e.clientX, e.clientY);
+    });
+    
+    itemEl.addEventListener("touchstart", (e) => {
+        if (e.touches.length === 1) {
+            const touch = e.touches[0];
+            dragStart(touch.clientX, touch.clientY);
+        }
+    }, { passive: true });
+    
+    // Sürükleme Hareketi
+    const dragMove = (clientX, clientY) => {
+        if (!isDragging) return;
+        const dx = clientX - startX;
+        const dy = clientY - startY;
+        
+        let newLeft = initialLeft + dx;
+        let newTop = initialTop + dy;
+        
+        // Alan dışına taşmayı engelle (Boundary restriction)
+        newLeft = Math.max(0, Math.min(newLeft, area.clientWidth - 50));
+        newTop = Math.max(0, Math.min(newTop, area.clientHeight - 50));
+        
+        itemEl.style.left = `${newLeft}px`;
+        itemEl.style.top = `${newTop}px`;
+        
+        checkOverBins(itemEl);
+    };
+    
+    const onMouseMove = (e) => {
+        if (isDragging) dragMove(e.clientX, e.clientY);
+    };
+    
+    const onTouchMove = (e) => {
+        if (isDragging && e.touches.length === 1) {
+            const touch = e.touches[0];
+            dragMove(touch.clientX, touch.clientY);
+        }
+    };
+    
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("touchmove", onTouchMove, { passive: true });
+    
+    // Bırakma (Drop)
+    const dragEnd = () => {
+        if (!isDragging) return;
+        isDragging = false;
+        
+        itemEl.style.transform = "";
+        itemEl.style.zIndex = "";
+        itemEl.style.cursor = "";
+        
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("touchmove", onTouchMove);
+        
+        // Bırakılan kutuyu tespit et
+        const matchedBin = getBinUnderItem(itemEl);
+        
+        document.querySelectorAll(".recycle-bin").forEach(bin => bin.classList.remove("drag-over"));
+        
+        if (matchedBin) {
+            const binType = matchedBin.getAttribute("data-bin-type");
+            const itemType = itemEl.getAttribute("data-item-type");
+            
+            if (binType === itemType) {
+                // Doğru kutuya bırakıldı!
+                recycleScore += 20;
+                document.getElementById("recycle-score-val").textContent = recycleScore;
+                createSparkleEffect(matchedBin.offsetLeft + matchedBin.offsetWidth/2, matchedBin.offsetTop + 10);
+                showFloatingScore(itemEl, "+20");
+                
+                recycleActiveItems = recycleActiveItems.filter(i => i !== itemEl);
+                itemEl.remove();
+                return; // Döngü sonlanır, düşmeye devam etmez
+            } else {
+                // Yanlış kutuya bırakıldı
+                recycleScore = Math.max(0, recycleScore - 10);
+                document.getElementById("recycle-score-val").textContent = recycleScore;
+                matchedBin.style.animation = "shake 0.5s";
+                setTimeout(() => matchedBin.style.animation = "", 500);
+            }
+        }
+    };
+    
+    document.addEventListener("mouseup", dragEnd);
+    document.addEventListener("touchend", dragEnd);
     
     // Aşağı süzülme animasyonu (Physics Loop)
     let topVal = 0;
-    const speed = 1.2 + Math.random() * 1.5; // Farklı hızlar
     
     function fall() {
         if (activeScreen !== "recycle" || !itemEl.parentNode) return;
-        topVal += speed;
-        itemEl.style.top = `${topVal}px`;
         
-        if (topVal < area.clientHeight - 50) {
-            requestAnimationFrame(fall);
+        if (!isDragging) {
+            topVal = parseFloat(itemEl.style.top) + speed;
+            itemEl.style.top = `${topVal}px`;
+            
+            if (topVal < area.clientHeight - 50) {
+                requestAnimationFrame(fall);
+            } else {
+                // Yere ulaştı, kaybol
+                itemEl.style.transition = "opacity 0.3s";
+                itemEl.style.opacity = 0;
+                setTimeout(() => {
+                    if (itemEl.parentNode) {
+                        recycleActiveItems = recycleActiveItems.filter(i => i !== itemEl);
+                        itemEl.remove();
+                    }
+                }, 300);
+            }
         } else {
-            // Yere ulaştı, kaybol
-            itemEl.style.transition = "opacity 0.3s";
-            itemEl.style.opacity = 0;
-            setTimeout(() => {
-                if (itemEl.parentNode) {
-                    recycleActiveItems = recycleActiveItems.filter(i => i !== itemEl);
-                    itemEl.remove();
-                }
-            }, 300);
+            // Sürükleme esnasında yerçekimini geçici olarak durdur fakat durumu takip et
+            requestAnimationFrame(fall);
         }
     }
     
@@ -3508,6 +3648,7 @@ function renderFormulaTubes() {
 }
 
 function handleTubeClick(index) {
+    if (formulaIsPouring) return; // Dökülme esnasında yeni tıklamaları kilitle
     if (formulaSelectedTubeIndex === null) {
         // İlk tüpü seç
         if (formulaCurrentTubes[index].length > 0) {
@@ -3528,7 +3669,115 @@ function handleTubeClick(index) {
     }
 }
 
+let formulaIsPouring = false;
+
+function createLiquidSplashEffect(tubeEl, color) {
+    // 6 adet küçük sıvı damlacık partikülü fırlatıp patlatalım (Droplets Splash)
+    for (let i = 0; i < 7; i++) {
+        const droplet = document.createElement("div");
+        droplet.style.position = "absolute";
+        droplet.style.width = "6px";
+        droplet.style.height = "6px";
+        droplet.style.borderRadius = "50%";
+        
+        // Renk atamaları
+        let dropletColor = "#8b5cf6"; // lavender default
+        if (color === "pine") dropletColor = "#10b981";
+        else if (color === "oxygen") dropletColor = "#0ea5e9";
+        else if (color === "lemon") dropletColor = "#eab308";
+        
+        droplet.style.backgroundColor = dropletColor;
+        droplet.style.left = "calc(50% - 3px)";
+        droplet.style.top = "40px"; // Sıvı birleşim üst noktası civarı
+        droplet.style.pointerEvents = "none";
+        droplet.style.transition = "all 0.5s cubic-bezier(0.1, 0.8, 0.3, 1)";
+        droplet.style.zIndex = "20";
+        
+        tubeEl.appendChild(droplet);
+        
+        // Rastgele açı ve fırlama mesafesi
+        const angle = -Math.PI / 4 - Math.random() * (Math.PI / 2); // Yukarı doğru fışkırma
+        const velocity = 20 + Math.random() * 25;
+        
+        setTimeout(() => {
+            const dx = Math.cos(angle) * velocity;
+            const dy = Math.sin(angle) * velocity;
+            droplet.style.transform = `translate(${dx}px, ${dy}px) scale(0.3)`;
+            droplet.style.opacity = 0;
+        }, 10);
+        
+        setTimeout(() => droplet.remove(), 550);
+    }
+}
+
+function animatePour(sourceIdx, targetIdx, color, onComplete) {
+    const tubes = document.querySelectorAll(".formula-tube");
+    const sourceTubeEl = tubes[sourceIdx];
+    const targetTubeEl = tubes[targetIdx];
+    
+    if (!sourceTubeEl || !targetTubeEl) {
+        onComplete();
+        return;
+    }
+    
+    // Kaynak tüpün en üstteki katmanını bul (DOM'da silinmeden önce)
+    const layers = sourceTubeEl.querySelectorAll(".liquid-layer");
+    const sourceLayerEl = layers[layers.length - 1];
+    
+    if (sourceLayerEl) {
+        const isTargetOnRight = targetIdx > sourceIdx;
+        
+        // 1. Eğilme Hareketi (Tilting rotation)
+        sourceTubeEl.style.transition = "transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)";
+        sourceTubeEl.style.transform = `translateY(-30px) rotate(${isTargetOnRight ? 40 : -45}deg)`;
+        
+        // 2. Sıvının boşalması (Shrink source height)
+        sourceLayerEl.style.transition = "height 0.35s ease";
+        sourceLayerEl.style.height = "0px";
+        
+        // 3. İnce Dikey Akış Şeridi (Vertical Pouring Stream)
+        const stream = document.createElement("div");
+        stream.classList.add("pouring-stream", `liquid-${color}`);
+        stream.style.position = "absolute";
+        stream.style.width = "6px";
+        stream.style.height = "120px";
+        stream.style.top = "-120px";
+        stream.style.left = "calc(50% - 3px)";
+        stream.style.borderRadius = "3px";
+        stream.style.transition = "top 0.15s ease-out";
+        targetTubeEl.appendChild(stream);
+        
+        setTimeout(() => {
+            stream.style.top = "0px";
+        }, 30);
+        
+        // 4. Hedef tüpte yeni katmanın yükselmesi
+        const newLayerEl = document.createElement("div");
+        newLayerEl.classList.add("liquid-layer", `liquid-${color}`);
+        newLayerEl.style.height = "0px";
+        newLayerEl.style.transition = "height 0.35s cubic-bezier(0.1, 0.8, 0.3, 1)";
+        targetTubeEl.appendChild(newLayerEl);
+        
+        setTimeout(() => {
+            newLayerEl.style.height = "40px";
+            createLiquidSplashEffect(targetTubeEl, color);
+        }, 120);
+        
+        // 5. Animasyon tamamlama ve temizlik
+        setTimeout(() => {
+            sourceTubeEl.style.transform = "";
+            stream.remove();
+            renderFormulaTubes();
+            onComplete();
+        }, 400);
+    } else {
+        onComplete();
+    }
+}
+
 function pourLiquid(source, target) {
+    if (formulaIsPouring) return;
+    
     const sourceTube = formulaCurrentTubes[source];
     const targetTube = formulaCurrentTubes[target];
     
@@ -3540,15 +3789,20 @@ function pourLiquid(source, target) {
     
     // Boşaltma Kuralları: Hedef ya boş olmalı ya da üstündeki sıvı rengi kaynak ile aynı olmalı
     if (targetTube.length === 0 || targetTopLiquid === movingLiquid) {
-        // Sıvıyı Aktar
+        formulaIsPouring = true;
+        
+        // Sıvıyı Veri Modelinden Çıkar
         sourceTube.pop();
         targetTube.push(movingLiquid);
         
         formulaMoves++;
         document.getElementById("formula-moves-val").textContent = formulaMoves;
         
-        // Başarı durumunu kontrol et
-        checkFormulaWin();
+        // Akıcı dökülme animasyonunu tetikle, bitince kazanma kontrolü yap
+        animatePour(source, target, movingLiquid, () => {
+            formulaIsPouring = false;
+            checkFormulaWin();
+        });
     }
 }
 
