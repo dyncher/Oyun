@@ -2821,7 +2821,8 @@ function renderWordSlots() {
         // Eğer bu yuvada bir harf seçilmişse göster
         if (i < wordUserSelections.length) {
             const poolIndex = wordUserSelections[i];
-            slotDiv.textContent = wordLetters[poolIndex].char;
+            const letterObj = wordLetters.find(l => l.poolIndex === poolIndex);
+            slotDiv.textContent = letterObj ? letterObj.char : "";
             slotDiv.classList.add("filled");
 
             // Tıklayınca bu harfi iptal etsin (Geri alsın)
@@ -2853,12 +2854,11 @@ function renderLettersPool() {
     });
 }
 
-// Havuzdaki Harfe Tıklama
 function handlePoolLetterClick(poolIndex) {
     if (isWordCompleted) return;
 
-    const letterObj = wordLetters[poolIndex];
-    if (letterObj.isUsed) return;
+    const letterObj = wordLetters.find(l => l.poolIndex === poolIndex);
+    if (!letterObj || letterObj.isUsed) return;
 
     if (wordUserSelections.length < activeWordObj.word.length) {
         letterObj.isUsed = true;
@@ -2880,7 +2880,8 @@ function handleSlotClick(slotIndex) {
 
     if (slotIndex < wordUserSelections.length) {
         const poolIndex = wordUserSelections[slotIndex];
-        wordLetters[poolIndex].isUsed = false;
+        const letterObj = wordLetters.find(l => l.poolIndex === poolIndex);
+        if (letterObj) letterObj.isUsed = false;
         wordUserSelections.splice(slotIndex, 1);
 
         renderWordSlots();
@@ -2892,16 +2893,34 @@ function handleSlotClick(slotIndex) {
 function shufflePoolLetters() {
     if (isWordCompleted) return;
 
-    // Sadece kullanılmamış harfleri karıştır
-    const unusedLetters = wordLetters.filter(l => !wordUserSelections.includes(l.poolIndex));
-    const unusedIndices = unusedLetters.map(l => l.poolIndex);
+    // Sadece kullanılmamış harflerin dizi pozisyonlarını (indices) ve kendilerini alalım
+    const unusedIndices = [];
+    const unusedLetters = [];
 
-    let shuffledIndices = [...unusedIndices];
-    shuffleArray(shuffledIndices);
+    wordLetters.forEach((letter, index) => {
+        if (!wordUserSelections.includes(letter.poolIndex)) {
+            unusedIndices.push(index);
+            unusedLetters.push(letter);
+        }
+    });
 
+    if (unusedLetters.length <= 1) return; // Karıştıracak yeterli harf yoksa çık
+
+    // Harfleri kendi aralarında karıştır
+    let shuffledLetters = [...unusedLetters];
+    let attempts = 0;
+    while (attempts < 10) {
+        shuffleArray(shuffledLetters);
+        if (shuffledLetters.some((l, i) => l.poolIndex !== unusedLetters[i].poolIndex)) {
+            break;
+        }
+        attempts++;
+    }
+
+    // Karıştırılan harfleri orijinal dizi pozisyonlarına yerleştir
     const newLetters = [...wordLetters];
-    unusedIndices.forEach((oldIdx, i) => {
-        newLetters[oldIdx] = wordLetters[shuffledIndices[i]];
+    unusedIndices.forEach((arrayIdx, i) => {
+        newLetters[arrayIdx] = shuffledLetters[i];
     });
 
     wordLetters = newLetters;
@@ -2921,7 +2940,10 @@ function clearWordRound() {
 
 // Kelimenin Doğruluğunu Kontrol Et
 function checkWordSuccess() {
-    const userWord = wordUserSelections.map(idx => wordLetters[idx].char).join("").toUpperCase();
+    const userWord = wordUserSelections.map(idx => {
+        const letterObj = wordLetters.find(l => l.poolIndex === idx);
+        return letterObj ? letterObj.char : "";
+    }).join("").toUpperCase();
     const correctWord = activeWordObj.word.toUpperCase();
 
     if (userWord === correctWord) {
