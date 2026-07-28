@@ -47,10 +47,10 @@
     <div class="app-container">
         <!-- HEADER (Tüm ekranlarda ortak üst bar) -->
         <header class="app-header">
-            <a href="https://chooktemiz.com" class="header-logo" id="logo-btn" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
+            <div class="header-logo" id="logo-btn" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                 <img src="assets/favicon.png" alt="CHOX" style="height: 32px; width: 32px; border-radius: 50%; object-fit: contain;">
                 <span class="logo-text"><span class="accent-text">chooktemiz</span>.com/oyun</span>
-            </a>
+            </div>
             <div class="header-stats">
                 <div class="stat-badge coin-badge">
                     <i class="fas fa-crown gold-crown"></i>
@@ -145,10 +145,10 @@
 
                 <!-- Marka Tanıtım Şeridi (İçerik Besleme Alanı) -->
                 <footer class="brands-footer" style="justify-content: center;">
-                    <div class="brand-item">
-                        <span class="brand-logo purple">Chook Temiz</span>
-                        <p class="brand-text">Profesyonel Temizlik Çözümleri</p>
-                    </div>
+                    <a href="https://chooktemiz.com" target="_blank" class="brand-item" style="text-decoration: none; text-align: center; display: block; cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                        <span class="brand-logo purple" style="display: block; margin-bottom: 4px;">Chook Temiz</span>
+                        <p class="brand-text" style="margin: 0; color: #94a3b8;">Profesyonel Temizlik Çözümleri</p>
+                    </a>
                 </footer>
             </section>
 
