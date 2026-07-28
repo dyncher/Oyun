@@ -3029,7 +3029,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Paylaşım Bilgilerini Belirle (Skora ve aktif ekrana göre dinamik)
     function getShareData() {
-        const url = "https://oyun.chooktemiz.com/?utm_source=share";
+        const url = "https://chooktemiz.com/oyun/?utm_source=share";
         let text = "Chook Temiz Zeka Dünyası'nda eğlenceli temizlik zeka oyunları oynuyorum! Sen de sevimli kedi CHOX ile yarışmaya katıl: " + url;
         
         // Eğer oyuncu bir oyundaysa veya skoru varsa metni zenginleştir
