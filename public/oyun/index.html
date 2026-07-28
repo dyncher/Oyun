@@ -141,6 +141,44 @@
                             Harfleri Çöz <i class="fas fa-arrow-right"></i>
                         </div>
                     </div>
+                    <!-- Mod 5: Geri Dönüşüm (Yeni) -->
+                    <div class="mode-card card-recycle" id="start-recycle-btn" style="background: rgba(59, 130, 246, 0.04); border-color: rgba(59, 130, 246, 0.15);">
+                        <div class="mode-card-badge" style="background: #3b82f6; color: #ffffff;">ÇEVRECİ</div>
+                        <div class="mode-icon-wrapper" style="color: #3b82f6;">
+                            <i class="fas fa-recycle"></i>
+                        </div>
+                        <h2 class="mode-title" data-i18n="mode-recycle-title">Geri Dönüşüm</h2>
+                        <p class="mode-desc" data-i18n="mode-recycle-desc">Düşen atıkları doğru geri dönüşüm kutularına yerleştirin, doğamızı CHOX ile koruyun!</p>
+                        <div class="mode-play-btn" style="color: #3b82f6;" data-i18n="mode-recycle-play">
+                            Çöpleri Ayıkla <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+
+                    <!-- Mod 6: Leke Avcısı (Yeni) -->
+                    <div class="mode-card card-stain" id="start-stain-btn" style="background: rgba(139, 92, 246, 0.04); border-color: rgba(139, 92, 246, 0.15);">
+                        <div class="mode-card-badge" style="background: #8b5cf6; color: #ffffff;">TERTEMİZ</div>
+                        <div class="mode-icon-wrapper" style="color: #8b5cf6;">
+                            <i class="fas fa-soap"></i>
+                        </div>
+                        <h2 class="mode-title" data-i18n="mode-stain-title">Leke Avcısı</h2>
+                        <p class="mode-desc" data-i18n="mode-stain-desc">Yüzeydeki kirli lekeleri Chook spreyiyle köpürtüp silin, pırıl pırıl temizliğin keyfini çıkarın!</p>
+                        <div class="mode-play-btn" style="color: #8b5cf6;" data-i18n="mode-stain-play">
+                            Lekeleri Sil <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+
+                    <!-- Mod 7: Akıllı Formül (Yeni) -->
+                    <div class="mode-card card-formula" id="start-formula-btn" style="background: rgba(236, 72, 153, 0.04); border-color: rgba(236, 72, 153, 0.15);">
+                        <div class="mode-card-badge" style="background: #ec4899; color: #ffffff;">LABORATUVAR</div>
+                        <div class="mode-icon-wrapper" style="color: #ec4899;">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                        <h2 class="mode-title" data-i18n="mode-formula-title">Akıllı Formül</h2>
+                        <p class="mode-desc" data-i18n="mode-formula-desc">Deney tüplerindeki farklı renkli temizlik sıvılarını ayırın, mükemmel formülü çözün!</p>
+                        <div class="mode-play-btn" style="color: #ec4899;" data-i18n="mode-formula-play">
+                            Sıvıları Ayrıştır <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Marka Tanıtım Şeridi (İçerik Besleme Alanı) -->
@@ -395,6 +433,102 @@
                     <div class="options-list" id="trivia-options">
                         <!-- Seçenekler JS ile buraya dinamik eklenecek -->
                     </div>
+                </div>
+            </section>
+
+            <!-- 5. GERİ DÖNÜŞÜM / ÇÖP AYIKLAMA EKRANI (Yeni) -->
+            <section id="screen-recycle" class="game-screen">
+                <div class="game-control-bar">
+                    <button class="back-to-dashboard-btn text-btn">
+                        <i class="fas fa-chevron-left"></i> Geri
+                    </button>
+                    <div class="recycle-timer" style="font-family: 'Outfit', sans-serif; font-weight: 700; color: #3b82f6; font-size: 18px;">
+                        <i class="fas fa-clock"></i> <span id="recycle-timer-val">60</span>s
+                    </div>
+                    <div class="recycle-score" style="font-family: 'Outfit', sans-serif; font-weight: 700; color: #ffffff; font-size: 18px;">
+                        Skor: <span id="recycle-score-val">0</span>
+                    </div>
+                </div>
+
+                <!-- Çöp Düşme Sahası -->
+                <div class="recycle-game-area" id="recycle-game-area" style="position: relative; width: 100%; height: 350px; background: rgba(0, 0, 0, 0.2); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.05); overflow: hidden; margin-top: 16px;">
+                    <div class="recycle-instruction" id="recycle-start-hint" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 85%; color: #94a3b8; font-size: 14px; pointer-events: none;">
+                        <i class="fas fa-hand-pointer" style="font-size: 32px; color: #3b82f6; margin-bottom: 12px; display: block; animation: pulse 1.5s infinite;"></i>
+                        Düşen atıkları doğru geri dönüşüm kutularına sürükleyin veya önce atığa, sonra kutuya tıklayın!
+                    </div>
+                    <!-- Düşen çöpler JS ile buraya eklenecek -->
+                </div>
+
+                <!-- Geri Dönüşüm Kutuları -->
+                <div class="recycle-bins-container" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px;">
+                    <!-- Kutub 1: Plastik -->
+                    <div class="recycle-bin" id="bin-plastic" data-bin-type="plastic" style="background: rgba(59, 130, 246, 0.1); border: 2px solid #3b82f6; border-radius: 16px; padding: 12px 6px; text-align: center; color: #ffffff; transition: all 0.2s; cursor: pointer;">
+                        <i class="fas fa-bottle-water" style="font-size: 28px; color: #3b82f6; margin-bottom: 8px;"></i>
+                        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Plastik</div>
+                    </div>
+                    <!-- Kutub 2: Kağıt -->
+                    <div class="recycle-bin" id="bin-paper" data-bin-type="paper" style="background: rgba(234, 179, 8, 0.1); border: 2px solid #eab308; border-radius: 16px; padding: 12px 6px; text-align: center; color: #ffffff; transition: all 0.2s; cursor: pointer;">
+                        <i class="fas fa-file-lines" style="font-size: 28px; color: #eab308; margin-bottom: 8px;"></i>
+                        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Kağıt</div>
+                    </div>
+                    <!-- Kutub 3: Organik -->
+                    <div class="recycle-bin" id="bin-organic" data-bin-type="organic" style="background: rgba(139, 92, 246, 0.1); border: 2px solid #8b5cf6; border-radius: 16px; padding: 12px 6px; text-align: center; color: #ffffff; transition: all 0.2s; cursor: pointer;">
+                        <i class="fas fa-apple-whole" style="font-size: 28px; color: #8b5cf6; margin-bottom: 8px;"></i>
+                        <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Organik</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. LEKE AVICISI / KÖPÜK PATLATMA EKRANI (Yeni) -->
+            <section id="screen-stain" class="game-screen">
+                <div class="game-control-bar">
+                    <button class="back-to-dashboard-btn text-btn">
+                        <i class="fas fa-chevron-left"></i> Geri
+                    </button>
+                    <div class="stain-cleanliness" style="font-family: 'Outfit', sans-serif; font-weight: 700; color: #8b5cf6; font-size: 18px;">
+                        <i class="fas fa-wand-magic-sparkles"></i> Temizlik: <span id="stain-clean-val">0</span>%
+                    </div>
+                    <div class="stain-score" style="font-family: 'Outfit', sans-serif; font-weight: 700; color: #ffffff; font-size: 18px;">
+                        Skor: <span id="stain-score-val">0</span>
+                    </div>
+                </div>
+
+                <!-- Temizlik Alanı (Cam) -->
+                <div class="stain-game-area" id="stain-game-area" style="position: relative; width: 100%; height: 380px; background: radial-gradient(circle, rgba(139, 92, 246, 0.05) 0%, rgba(15, 23, 42, 0.6) 100%); border-radius: 24px; border: 2px solid rgba(139, 92, 246, 0.2); overflow: hidden; margin-top: 16px; cursor: crosshair;">
+                    <div class="stain-instruction" id="stain-start-hint" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 85%; color: #94a3b8; font-size: 14px; pointer-events: none; z-index: 10;">
+                        <i class="fas fa-spray-can-sparkles" style="font-size: 32px; color: #8b5cf6; margin-bottom: 12px; display: block; animation: pulse 1.5s infinite;"></i>
+                        Lekelerin üzerini parmağınızla veya mouse ile ovalayarak köpürtün ve pırıl pırıl temizleyin!
+                    </div>
+                    <!-- Lekeler ve Köpükler JS ile eklenecek -->
+                </div>
+            </section>
+
+            <!-- 7. AKILLI FORMÜL / SIVI SIRALAMA EKRANI (Yeni) -->
+            <section id="screen-formula" class="game-screen">
+                <div class="game-control-bar">
+                    <button class="back-to-dashboard-btn text-btn">
+                        <i class="fas fa-chevron-left"></i> Geri
+                    </button>
+                    <div class="formula-level" style="font-family: 'Outfit', sans-serif; font-weight: 700; color: #ec4899; font-size: 18px;">
+                        Seviye: <span id="formula-level-val">1</span>
+                    </div>
+                    <div class="formula-moves" style="font-family: 'Outfit', sans-serif; font-weight: 700; color: #ffffff; font-size: 18px;">
+                        Hamle: <span id="formula-moves-val">0</span>
+                    </div>
+                </div>
+
+                <div class="formula-instruction" style="text-align: center; color: #94a3b8; font-size: 13px; margin: 16px 0 8px 0; padding: 0 12px;">
+                    Tüplerdeki temizlik sıvılarını ayırın. Her tüpte tek bir formül rengi biriktirmeye çalışın!
+                </div>
+
+                <!-- Tüpler Sahası -->
+                <div class="formula-tubes-container" id="formula-tubes-container" style="display: flex; justify-content: space-around; align-items: flex-end; width: 100%; height: 280px; margin: 24px 0; padding: 12px 0;">
+                    <!-- Deney tüpleri JS ile buraya eklenecek -->
+                </div>
+
+                <!-- Kontrol Butonları -->
+                <div style="display: flex; justify-content: center; gap: 12px; margin-top: 16px;">
+                    <button id="formula-reset-btn" class="secondary-btn" style="padding: 10px 18px; font-size: 13px; border-color: rgba(236, 72, 153, 0.2);"><i class="fas fa-redo"></i> Seviyeyi Sıfırla</button>
                 </div>
             </section>
         </main>

@@ -1694,6 +1694,26 @@ function setupEventListeners() {
         startWordBtn.addEventListener("click", () => switchScreen("word"));
     }
 
+    const startRecycleBtn = document.getElementById("start-recycle-btn");
+    if (startRecycleBtn) {
+        startRecycleBtn.addEventListener("click", () => switchScreen("recycle"));
+    }
+
+    const startStainBtn = document.getElementById("start-stain-btn");
+    if (startStainBtn) {
+        startStainBtn.addEventListener("click", () => switchScreen("stain"));
+    }
+
+    const startFormulaBtn = document.getElementById("start-formula-btn");
+    if (startFormulaBtn) {
+        startFormulaBtn.addEventListener("click", () => switchScreen("formula"));
+    }
+
+    const formulaResetBtn = document.getElementById("formula-reset-btn");
+    if (formulaResetBtn) {
+        formulaResetBtn.addEventListener("click", () => resetFormulaLevel());
+    }
+
     // Logo Tıklama (Ana Sayfaya Dönüş)
     document.getElementById("logo-btn").addEventListener("click", () => switchScreen("dashboard"));
 
@@ -1787,6 +1807,8 @@ function switchScreen(screenName, levelNum = null) {
     stopMemoryTimer();
     stopPuzzleTimer();
     stopWordTimer();
+    stopRecycleTimer();
+    stopStainTimer();
     
     // Tüm ekranları gizle
     document.querySelectorAll(".game-screen").forEach(screen => {
@@ -1813,6 +1835,12 @@ function switchScreen(screenName, levelNum = null) {
         startPuzzleGame();
     } else if (screenName === "word") {
         startWordGame();
+    } else if (screenName === "recycle") {
+        startRecycleGame();
+    } else if (screenName === "stain") {
+        startStainGame();
+    } else if (screenName === "formula") {
+        startFormulaGame();
     }
 }
 
@@ -2368,6 +2396,12 @@ function restartCurrentGame() {
         startPuzzleGame();
     } else if (activeScreen === "word") {
         loadWordRound(currentWordIndex);
+    } else if (activeScreen === "recycle") {
+        startRecycleGame();
+    } else if (activeScreen === "stain") {
+        startStainGame();
+    } else if (activeScreen === "formula") {
+        startFormulaGame();
     }
 }
 
@@ -3079,4 +3113,481 @@ document.addEventListener("DOMContentLoaded", () => {
         shareTray.classList.remove("active");
     });
 });
+
+// ==========================================================================
+// 11. GERİ DÖNÜŞÜM OYUN MOTORU (RECYCLING GAME ENGINE)
+// ==========================================================================
+let recycleTimerInterval = null;
+let recycleSpawnInterval = null;
+let recycleScore = 0;
+let recycleTimeLeft = 60;
+let recycleActiveItems = [];
+let selectedRecycleItem = null; // Tıkla-seç desteği için
+
+const RECYCLE_ITEMS_DATA = [
+    { emoji: "🧴", type: "plastic" }, // Plastik Şişe
+    { emoji: "🥤", type: "plastic" }, // Plastik Bardak
+    { emoji: "📦", type: "paper" },   // Karton Kutu
+    { emoji: "📰", type: "paper" },   // Gazete
+    { emoji: "🍎", type: "organic" }, // Elma
+    { emoji: "🍌", type: "organic" }, // Muz Kabuğu
+    { emoji: "🍕", type: "organic" }  // Dilim Pizza
+];
+
+function stopRecycleTimer() {
+    if (recycleTimerInterval) clearInterval(recycleTimerInterval);
+    if (recycleSpawnInterval) clearInterval(recycleSpawnInterval);
+    recycleActiveItems.forEach(item => item.remove());
+    recycleActiveItems = [];
+    selectedRecycleItem = null;
+}
+
+function startRecycleGame() {
+    stopRecycleTimer();
+    recycleScore = 0;
+    recycleTimeLeft = 45; // 45 saniyelik daha dinamik bir oyun yapalım
+    document.getElementById("recycle-score-val").textContent = recycleScore;
+    document.getElementById("recycle-timer-val").textContent = recycleTimeLeft;
+    
+    const hint = document.getElementById("recycle-start-hint");
+    if (hint) hint.style.display = "block";
+    
+    // Timer'ı Başlat
+    recycleTimerInterval = setInterval(() => {
+        recycleTimeLeft--;
+        document.getElementById("recycle-timer-val").textContent = recycleTimeLeft;
+        if (recycleTimeLeft <= 0) {
+            endRecycleGame();
+        }
+    }, 1000);
+    
+    // Çöp Spawner'ı Başlat
+    recycleSpawnInterval = setInterval(spawnRecycleItem, 1400);
+    
+    // Kutuları dinle (Tıkla-Seç için)
+    document.querySelectorAll(".recycle-bin").forEach(bin => {
+        bin.onclick = () => {
+            if (selectedRecycleItem) {
+                const targetBinType = bin.getAttribute("data-bin-type");
+                const itemType = selectedRecycleItem.getAttribute("data-item-type");
+                
+                if (targetBinType === itemType) {
+                    // Doğru!
+                    recycleScore += 20;
+                    document.getElementById("recycle-score-val").textContent = recycleScore;
+                    createSparkleEffect(bin.offsetLeft + bin.offsetWidth/2, bin.offsetTop);
+                    showFloatingScore(selectedRecycleItem, "+20");
+                } else {
+                    // Yanlış
+                    recycleScore = Math.max(0, recycleScore - 10);
+                    document.getElementById("recycle-score-val").textContent = recycleScore;
+                    bin.style.animation = "shake 0.5s";
+                    setTimeout(() => bin.style.animation = "", 500);
+                }
+                
+                recycleActiveItems = recycleActiveItems.filter(i => i !== selectedRecycleItem);
+                selectedRecycleItem.remove();
+                selectedRecycleItem = null;
+            }
+        };
+    });
+}
+
+function spawnRecycleItem() {
+    const area = document.getElementById("recycle-game-area");
+    if (!area || activeScreen !== "recycle") return;
+    
+    const hint = document.getElementById("recycle-start-hint");
+    if (hint && recycleScore > 0) hint.style.display = "none";
+    
+    const randomItem = RECYCLE_ITEMS_DATA[Math.floor(Math.random() * RECYCLE_ITEMS_DATA.length)];
+    const itemEl = document.createElement("div");
+    itemEl.classList.add("recycle-item");
+    itemEl.textContent = randomItem.emoji;
+    itemEl.setAttribute("data-item-type", randomItem.type);
+    
+    // Rastgele yatay pozisyon
+    const xPos = Math.random() * (area.clientWidth - 50);
+    itemEl.style.left = `${xPos}px`;
+    itemEl.style.top = "0px";
+    
+    area.appendChild(itemEl);
+    recycleActiveItems.push(itemEl);
+    
+    // Tıklama ile Seçme
+    itemEl.onclick = (e) => {
+        e.stopPropagation();
+        if (selectedRecycleItem) {
+            selectedRecycleItem.style.border = "none";
+        }
+        selectedRecycleItem = itemEl;
+        itemEl.style.border = "2px dashed #3b82f6";
+        itemEl.style.borderRadius = "50px";
+        itemEl.style.padding = "4px";
+    };
+    
+    // Aşağı süzülme animasyonu (Physics Loop)
+    let topVal = 0;
+    const speed = 1.2 + Math.random() * 1.5; // Farklı hızlar
+    
+    function fall() {
+        if (activeScreen !== "recycle" || !itemEl.parentNode) return;
+        topVal += speed;
+        itemEl.style.top = `${topVal}px`;
+        
+        if (topVal < area.clientHeight - 50) {
+            requestAnimationFrame(fall);
+        } else {
+            // Yere ulaştı, kaybol
+            itemEl.style.transition = "opacity 0.3s";
+            itemEl.style.opacity = 0;
+            setTimeout(() => {
+                if (itemEl.parentNode) {
+                    recycleActiveItems = recycleActiveItems.filter(i => i !== itemEl);
+                    itemEl.remove();
+                }
+            }, 300);
+        }
+    }
+    
+    requestAnimationFrame(fall);
+}
+
+function showFloatingScore(targetEl, text) {
+    const floatEl = document.createElement("div");
+    floatEl.textContent = text;
+    floatEl.style.position = "absolute";
+    floatEl.style.left = targetEl.style.left;
+    floatEl.style.top = targetEl.style.top;
+    floatEl.style.color = "#3b82f6";
+    floatEl.style.fontWeight = "bold";
+    floatEl.style.fontSize = "20px";
+    floatEl.style.pointerEvents = "none";
+    floatEl.style.transition = "all 0.8s ease-out";
+    
+    document.getElementById("recycle-game-area").appendChild(floatEl);
+    
+    setTimeout(() => {
+        floatEl.style.transform = "translateY(-40px)";
+        floatEl.style.opacity = 0;
+    }, 50);
+    
+    setTimeout(() => floatEl.remove(), 900);
+}
+
+function endRecycleGame() {
+    stopRecycleTimer();
+    
+    updatePlayerTotalScore(recycleScore);
+    
+    showResultModal({
+        title: "Tebrikler Çevreci!",
+        subtitle: "Atıkları sevgiyle ayrıştırdın!",
+        score: `+${recycleScore}`,
+        secLabel: "Kutulanan Atık",
+        secVal: Math.floor(recycleScore / 20),
+        promo: "Geri dönüşüme kazandırdığınız her plastik şişe, doğada 450 yıl kalacak bir atığı engeller!",
+        hasNextLevel: false
+    });
+}
+
+// ==========================================================================
+// 12. LEKE AVICISI OYUN MOTORU (STAIN REMOVER GAME ENGINE)
+// ==========================================================================
+let stainScore = 0;
+let stainCleanedCount = 0;
+let totalStainsCreated = 0;
+let stainActiveList = [];
+
+const STAIN_TYPES = [
+    { color: "rgba(120, 53, 4, 0.75)", size: 40, label: "Kahve" },
+    { color: "rgba(69, 26, 3, 0.8)", size: 55, label: "Çamur" },
+    { color: "rgba(220, 38, 38, 0.7)", size: 30, label: "Yağ" }
+];
+
+function stopStainTimer() {
+    stainActiveList.forEach(s => s.remove());
+    stainActiveList = [];
+}
+
+function startStainGame() {
+    stopStainTimer();
+    stainScore = 0;
+    stainCleanedCount = 0;
+    totalStainsCreated = 10; // Her roundda 10 leke temizleme görevi
+    
+    document.getElementById("stain-score-val").textContent = stainScore;
+    document.getElementById("stain-clean-val").textContent = "0";
+    
+    const hint = document.getElementById("stain-start-hint");
+    if (hint) hint.style.display = "block";
+    
+    const area = document.getElementById("stain-game-area");
+    if (!area) return;
+    
+    // Lekeleri Yerleştir
+    for (let i = 0; i < totalStainsCreated; i++) {
+        spawnStain();
+    }
+}
+
+function spawnStain() {
+    const area = document.getElementById("stain-game-area");
+    const type = STAIN_TYPES[Math.floor(Math.random() * STAIN_TYPES.length)];
+    
+    const stainEl = document.createElement("div");
+    stainEl.classList.add("stain-item");
+    
+    stainEl.style.width = `${type.size}px`;
+    stainEl.style.height = `${type.size}px`;
+    stainEl.style.backgroundColor = type.color;
+    
+    // Cam yüzeyde rastgele konum
+    const xPos = 20 + Math.random() * (area.clientWidth - type.size - 40);
+    const yPos = 20 + Math.random() * (area.clientHeight - type.size - 40);
+    
+    stainEl.style.left = `${xPos}px`;
+    stainEl.style.top = `${yPos}px`;
+    
+    // Temizlik / Silinme Can Seviyesi
+    let stainHealth = 100;
+    
+    // Fareyle veya Parmağıyla sürükleme (Ovalama tespiti)
+    const rubHandler = (e) => {
+        e.preventDefault();
+        const hint = document.getElementById("stain-start-hint");
+        if (hint) hint.style.display = "none";
+        
+        stainHealth -= 15; // Her ovalamada canı azalır
+        
+        // Köpük Efekti Yarat (Satisfying animation)
+        createBubbleEffect(stainEl.offsetLeft + stainEl.clientWidth/2, stainEl.offsetTop + stainEl.clientHeight/2);
+        
+        if (stainHealth > 0) {
+            stainEl.style.opacity = stainHealth / 100;
+            stainEl.style.transform = `scale(${0.5 + (stainHealth / 200)})`;
+        } else {
+            stainEl.remove();
+            stainActiveList = stainActiveList.filter(s => s !== stainEl);
+            stainCleanedCount++;
+            stainScore += 30;
+            
+            document.getElementById("stain-score-val").textContent = stainScore;
+            
+            // Temizlik oranını güncelle
+            const percent = Math.round((stainCleanedCount / totalStainsCreated) * 100);
+            document.getElementById("stain-clean-val").textContent = percent;
+            
+            // Parlama Efekti
+            createSparkleEffect(stainEl.offsetLeft + stainEl.clientWidth/2, stainEl.offsetTop + stainEl.clientHeight/2);
+            
+            if (stainCleanedCount >= totalStainsCreated) {
+                endStainGame();
+            }
+        }
+    };
+    
+    stainEl.addEventListener("mousemove", (e) => {
+        if (e.buttons === 1) { // Sol tıklama basılıyken ovalama
+            rubHandler(e);
+        }
+    });
+    stainEl.addEventListener("touchmove", rubHandler);
+    stainEl.addEventListener("click", rubHandler); // Tıklama desteği
+    
+    area.appendChild(stainEl);
+    stainActiveList.push(stainEl);
+}
+
+function createBubbleEffect(x, y) {
+    const area = document.getElementById("stain-game-area");
+    if (!area) return;
+    const bubble = document.createElement("div");
+    bubble.classList.add("bubble-effect");
+    bubble.style.left = `${x - 12}px`;
+    bubble.style.top = `${y - 12}px`;
+    area.appendChild(bubble);
+    setTimeout(() => bubble.remove(), 800);
+}
+
+function createSparkleEffect(x, y) {
+    const area = document.getElementById("stain-game-area") || document.getElementById("recycle-game-area") || document.body;
+    const sparkle = document.createElement("div");
+    sparkle.classList.add("sparkle-effect");
+    sparkle.innerHTML = '<i class="fas fa-star"></i>';
+    sparkle.style.left = `${x - 10}px`;
+    sparkle.style.top = `${y - 10}px`;
+    area.appendChild(sparkle);
+    setTimeout(() => sparkle.remove(), 800);
+}
+
+function endStainGame() {
+    stopStainTimer();
+    
+    updatePlayerTotalScore(stainScore);
+    
+    showResultModal({
+        title: "Pırıl Pırıl!",
+        subtitle: "Lekelerden eser kalmadı!",
+        score: `+${stainScore}`,
+        secLabel: "Leke Ovalama",
+        secVal: stainCleanedCount,
+        promo: "Aktif formüllü Chook Temiz Yüzey Spreyi, inatçı yağ ve çay lekelerini ovalamaya gerek kalmadan saniyeler içinde çözer!",
+        hasNextLevel: false
+    });
+}
+
+// ==========================================================================
+// 13. AKILLI FORMÜL OYUN MOTORU (WATER SORT PUZZLE ENGINE)
+// ==========================================================================
+let formulaSelectedTubeIndex = null;
+let formulaMoves = 0;
+let formulaLevel = 1;
+
+// Her renk bir kimyasal bileşeni temsil eder (Sınıf isimleri css renkleriyle eşleşir)
+const LIQUID_TYPES = ["lavender", "pine", "oxygen"];
+
+// Seviyelere göre tüp sıvı dizilimleri
+const FORMULA_LEVELS = {
+    1: [
+        ["lavender", "pine", "lavender"],
+        ["pine", "lavender", "pine"],
+        [], // Boş tüp
+        []  // Boş tüp
+    ],
+    2: [
+        ["pine", "oxygen", "pine"],
+        ["oxygen", "lavender", "oxygen"],
+        ["lavender", "lavender", "pine"],
+        [] // Boş tüp
+    ]
+};
+
+let formulaCurrentTubes = [];
+
+function startFormulaGame() {
+    formulaMoves = 0;
+    formulaSelectedTubeIndex = null;
+    document.getElementById("formula-moves-val").textContent = formulaMoves;
+    document.getElementById("formula-level-val").textContent = formulaLevel;
+    
+    // Seviye dizilimini al veya bitince tekrar 1. seviyeyi şuradan döngüye sok
+    const originalSetup = FORMULA_LEVELS[formulaLevel] || FORMULA_LEVELS[1];
+    
+    // Derin kopyalayalım
+    formulaCurrentTubes = JSON.parse(JSON.stringify(originalSetup));
+    
+    renderFormulaTubes();
+}
+
+function resetFormulaLevel() {
+    startFormulaGame();
+}
+
+function renderFormulaTubes() {
+    const container = document.getElementById("formula-tubes-container");
+    if (!container) return;
+    container.innerHTML = "";
+    
+    formulaCurrentTubes.forEach((tubeLiquids, index) => {
+        const tubeEl = document.createElement("div");
+        tubeEl.classList.add("formula-tube");
+        if (formulaSelectedTubeIndex === index) {
+            tubeEl.classList.add("selected");
+        }
+        
+        tubeLiquids.forEach(liquidColor => {
+            const layerEl = document.createElement("div");
+            layerEl.classList.add("liquid-layer", `liquid-${liquidColor}`);
+            tubeEl.appendChild(layerEl);
+        });
+        
+        tubeEl.onclick = () => handleTubeClick(index);
+        container.appendChild(tubeEl);
+    });
+}
+
+function handleTubeClick(index) {
+    if (formulaSelectedTubeIndex === null) {
+        // İlk tüpü seç
+        if (formulaCurrentTubes[index].length > 0) {
+            formulaSelectedTubeIndex = index;
+            renderFormulaTubes();
+        }
+    } else {
+        // Sıvıyı başka bir tüpe dökme denemesi
+        const sourceIndex = formulaSelectedTubeIndex;
+        const targetIndex = index;
+        
+        if (sourceIndex !== targetIndex) {
+            pourLiquid(sourceIndex, targetIndex);
+        }
+        
+        formulaSelectedTubeIndex = null;
+        renderFormulaTubes();
+    }
+}
+
+function pourLiquid(source, target) {
+    const sourceTube = formulaCurrentTubes[source];
+    const targetTube = formulaCurrentTubes[target];
+    
+    if (sourceTube.length === 0) return; // Kaynak boş
+    if (targetTube.length >= 4) return;  // Hedef dolu (max 4 katman kapasite)
+    
+    const movingLiquid = sourceTube[sourceTube.length - 1];
+    const targetTopLiquid = targetTube[targetTube.length - 1];
+    
+    // Boşaltma Kuralları: Hedef ya boş olmalı ya da üstündeki sıvı rengi kaynak ile aynı olmalı
+    if (targetTube.length === 0 || targetTopLiquid === movingLiquid) {
+        // Sıvıyı Aktar
+        sourceTube.pop();
+        targetTube.push(movingLiquid);
+        
+        formulaMoves++;
+        document.getElementById("formula-moves-val").textContent = formulaMoves;
+        
+        // Başarı durumunu kontrol et
+        checkFormulaWin();
+    }
+}
+
+function checkFormulaWin() {
+    // Kazanma Şartı: Tüm tüpler ya tamamen boş olmalı, ya da tam dolu (3 katman) ve TEK RENK olmalı.
+    let isWon = true;
+    
+    formulaCurrentTubes.forEach(tube => {
+        if (tube.length > 0) {
+            // Tüp içindeki tüm renkler aynı mı?
+            const firstColor = tube[0];
+            const allSame = tube.every(color => color === firstColor);
+            
+            // Tam dolu mu (örneğin 3 katmanlı basit zeka puzzle'ımız için en az 3 katman)?
+            if (!allSame || tube.length < 3) {
+                isWon = false;
+            }
+        }
+    });
+    
+    if (isWon) {
+        setTimeout(() => {
+            const rewardPoints = Math.max(50, 150 - formulaMoves * 5);
+            updatePlayerTotalScore(rewardPoints);
+            
+            showResultModal({
+                title: "Formül Çözüldü!",
+                subtitle: "Harika bir kimyasal ayrıştırma!",
+                score: `+${rewardPoints}`,
+                secLabel: "Hamle Sayısı",
+                secVal: formulaMoves,
+                promo: "Chook deterjanları, doğaya zarar vermeyen organik anyonik aktif bileşenlerin milimetrik dengesiyle üretilir!",
+                hasNextLevel: false
+            });
+            
+            // Bir sonraki seviyeye geç veya seviye döngüsünü ayarla
+            formulaLevel = formulaLevel === 1 ? 2 : 1;
+        }, 500);
+    }
+}
+
 
